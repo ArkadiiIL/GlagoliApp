@@ -1,0 +1,25 @@
+# Android Studio
+.idea
+.gradle
+/*/local.properties
+/*/out
+/*/*/build
+build
+/*/*/production
+*.iml
+*.iws
+*.ipr
+*~
+*.swp
+
+# generated files
+bin/
+gen/
+build/
+
+# built application files
+*.apk
+*.ap_
+
+# Java class files
+*.class
