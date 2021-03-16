@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.core.app.ActivityCompat
-import com.arkadii.glagoli.databinding.ActivityMainScreenBinding
+import com.arkadii.glagoli.databinding.ActivityMainBinding
 import com.arkadii.glagoli.extensions.containsOnly
 import com.arkadii.glagoli.extensions.isPermissionGranted
 import com.arkadii.glagoli.extensions.requestPermission
@@ -17,15 +17,16 @@ import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity(),  ActivityCompat.OnRequestPermissionsResultCallback {
 
-    private lateinit var binding: ActivityMainScreenBinding
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main_screen)
         Log.i(TAG, "Start MainActivity")
 
         Log.i(TAG, "Init ActivityMainBinding")
-        binding = ActivityMainScreenBinding.inflate(layoutInflater)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        Log.i(TAG, "Set Content View")
+        setContentView(binding.root)
 
         checkPermission()
     }
