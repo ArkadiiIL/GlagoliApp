@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Glagoli</string>
+
+    <string name="ok">OK</string>
+    <string name="permission_record_audio_rationale">Record audio is needed for
+        the application to work correctly</string>
+    <string name="permission_available_record_audio">Record audio is granted,
+        you can continue</string>
+    <string name="permission_not_granted">Permission were not granted</string>
 </resources>

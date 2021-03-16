@@ -1,0 +1,1 @@
+Glagoli app is simple Dictaphone Application
