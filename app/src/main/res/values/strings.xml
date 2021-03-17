@@ -6,5 +6,8 @@
         the application to work correctly</string>
     <string name="permission_available_record_audio">Record audio is granted,
         you can continue</string>
-    <string name="permission_not_granted">Permission were not granted</string>
+    <string name="permission_not_granted">Sorry, but application can\'t work
+        without record audio permission. Please will grant record audio or close app</string>
+    <string name="to_settings">Open permission settings</string>
+    <string name="close_app">Close app</string>
 </resources>
