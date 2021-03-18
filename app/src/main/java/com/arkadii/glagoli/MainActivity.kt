@@ -12,6 +12,8 @@ class MainActivity : AppCompatActivity(),  ActivityCompat.OnRequestPermissionsRe
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var permissionHelper: PermissionHelper
+    private lateinit var mediaRecorderManager: MediaRecorderManager
+    var record = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,12 +25,18 @@ class MainActivity : AppCompatActivity(),  ActivityCompat.OnRequestPermissionsRe
 
     private fun init() {
         Log.i(TAG, "Init function")
+
         Log.v(TAG, "Init ActivityMainBinding")
         binding = ActivityMainBinding.inflate(layoutInflater)
+
         Log.v(TAG, "Set Content View")
         setContentView(binding.root)
+
         Log.v(TAG, "Init PermissionHelper")
         permissionHelper = PermissionHelper(this, binding.root)
+
+        Log.v(TAG, "Init MediaRecorderManager")
+        mediaRecorderManager = MediaRecorderManager(this)
     }
 
 
@@ -49,7 +57,15 @@ class MainActivity : AppCompatActivity(),  ActivityCompat.OnRequestPermissionsRe
         }
     }
 
-    fun startRecord(view: View) {}
+    fun startRecord(view: View) {
+        record = if(record) {
+            mediaRecorderManager.startRecording()
+            false
+        } else {
+            mediaRecorderManager.stopRecording()
+            true
+        }
+    }
 
     companion object {
         const val TAG = "MainActivityTAG"
