@@ -1,8 +1,10 @@
 package com.arkadii.glagoli
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import androidx.core.app.ActivityCompat
 import com.arkadii.glagoli.databinding.ActivityMainBinding
@@ -13,6 +15,7 @@ class MainActivity : AppCompatActivity(),  ActivityCompat.OnRequestPermissionsRe
     private lateinit var binding: ActivityMainBinding
     private lateinit var permissionHelper: PermissionHelper
     private lateinit var mediaRecorderManager: MediaRecorderManager
+    private lateinit var timerManager: TimerManager
     var record = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,6 +23,7 @@ class MainActivity : AppCompatActivity(),  ActivityCompat.OnRequestPermissionsRe
         Log.i(TAG, "Start MainActivity")
 
         init()
+        setListeners()
         permissionHelper.checkPermission()
     }
 
@@ -37,6 +41,25 @@ class MainActivity : AppCompatActivity(),  ActivityCompat.OnRequestPermissionsRe
 
         Log.v(TAG, "Init MediaRecorderManager")
         mediaRecorderManager = MediaRecorderManager(this)
+
+        Log.v(TAG, "Init TimeManager")
+        timerManager = TimerManager(binding.textTime, this)
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setListeners() {
+        binding.buttonStart.setOnTouchListener { _, event ->
+        if(event.action == MotionEvent.ACTION_DOWN && record) {
+            mediaRecorderManager.startRecording()
+            timerManager.start()
+            record = false
+        } else if(event.action == MotionEvent.ACTION_UP && !record) {
+            mediaRecorderManager.stopRecording()
+            timerManager.stop()
+            record = true
+        }
+            false
+        }
     }
 
 
@@ -54,16 +77,6 @@ class MainActivity : AppCompatActivity(),  ActivityCompat.OnRequestPermissionsRe
 
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        }
-    }
-
-    fun startRecord(view: View) {
-        record = if(record) {
-            mediaRecorderManager.startRecording()
-            false
-        } else {
-            mediaRecorderManager.stopRecording()
-            true
         }
     }
 

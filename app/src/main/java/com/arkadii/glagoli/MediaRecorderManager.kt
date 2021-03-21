@@ -4,24 +4,38 @@ import android.content.Context
 import android.media.MediaRecorder
 import android.util.Log
 import java.io.IOException
+import java.lang.RuntimeException
 
 class MediaRecorderManager(private val context: Context) {
     private var recorder: MediaRecorder? = null
+    private var startPlayer = false
     private val fileName = "${context.externalCacheDir?.absolutePath}/audiorecordtest.3gp"
 
     fun startRecording() {
         Log.i(TAG, "Start recording audio")
-        initRecorder()
-        recorder?.start()
+        if(!startPlayer) {
+            initRecorder()
+            recorder?.start()
+            startPlayer = true
+        }
     }
 
     fun stopRecording() {
         Log.i(TAG, "Stop recording audio")
-        recorder?.apply {
-            stop()
-            release()
+        if(startPlayer) {
+            recorder?.apply {
+                try {
+                    stop()
+                    release() }
+                catch (error: RuntimeException) {
+                    Log.w(TAG, "RuntimeException in stopRecording, " +
+                            "MediaRecorder hasn't received any data")
+                    Log.e(TAG, error.toString())
+                }
+            }
+            recorder = null
+            startPlayer = false
         }
-        recorder = null
     }
 
     private fun initRecorder() {
