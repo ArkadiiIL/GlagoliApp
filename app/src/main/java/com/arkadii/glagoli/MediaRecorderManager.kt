@@ -5,11 +5,16 @@ import android.media.MediaRecorder
 import android.util.Log
 import java.io.IOException
 import java.lang.RuntimeException
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MediaRecorderManager(private val context: Context) {
     private var recorder: MediaRecorder? = null
     private var startPlayer = false
-    private val fileName = "${context.externalCacheDir?.absolutePath}/audiorecordtest.3gp"
+    private var fileName = ""
+    private val simpleDateFormat =
+        SimpleDateFormat(
+            "ddMMyy-hhmmss", Locale.getDefault())
 
     fun startRecording() {
         Log.i(TAG, "Start recording audio")
@@ -34,12 +39,16 @@ class MediaRecorderManager(private val context: Context) {
                 }
             }
             recorder = null
+            fileName = ""
             startPlayer = false
         }
     }
 
     private fun initRecorder() {
         Log.i(TAG, "Init recorder")
+        fileName =
+            "${context.externalCacheDir?.absolutePath}" +
+                    "/audiorecord-${simpleDateFormat.format(Date())}.3gp"
         recorder = MediaRecorder().apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
             setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
@@ -56,6 +65,6 @@ class MediaRecorderManager(private val context: Context) {
 
 
     companion object {
-        const val TAG = "MediaRecorderManagerTAG"
+        const val TAG = "MediaRecorderManagerCHECKTAG"
     }
 }

@@ -1,11 +1,11 @@
 package com.arkadii.glagoli
 
 import android.annotation.SuppressLint
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.arkadii.glagoli.databinding.ActivityMainBinding
 
@@ -14,16 +14,13 @@ class MainActivity : AppCompatActivity(),  ActivityCompat.OnRequestPermissionsRe
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var permissionHelper: PermissionHelper
-    private lateinit var mediaRecorderManager: MediaRecorderManager
-    private lateinit var timerManager: TimerManager
-    var record = true
+    private var switch = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.i(TAG, "Start MainActivity")
 
         init()
-        setListeners()
         permissionHelper.checkPermission()
     }
 
@@ -39,29 +36,10 @@ class MainActivity : AppCompatActivity(),  ActivityCompat.OnRequestPermissionsRe
         Log.v(TAG, "Init PermissionHelper")
         permissionHelper = PermissionHelper(this, binding.root)
 
-        Log.v(TAG, "Init MediaRecorderManager")
-        mediaRecorderManager = MediaRecorderManager(this)
-
-        Log.v(TAG, "Init TimeManager")
-        timerManager = TimerManager(binding.textTime, this)
+        Log.v(TAG, "Init pager adapter")
+        binding.viewPager.adapter = ViewPageAdapter(this)
+        binding.viewPager.currentItem = 0
     }
-
-    @SuppressLint("ClickableViewAccessibility")
-    private fun setListeners() {
-        binding.buttonStart.setOnTouchListener { _, event ->
-        if(event.action == MotionEvent.ACTION_DOWN && record) {
-            mediaRecorderManager.startRecording()
-            timerManager.start()
-            record = false
-        } else if(event.action == MotionEvent.ACTION_UP && !record) {
-            mediaRecorderManager.stopRecording()
-            timerManager.stop()
-            record = true
-        }
-            false
-        }
-    }
-
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -81,7 +59,19 @@ class MainActivity : AppCompatActivity(),  ActivityCompat.OnRequestPermissionsRe
     }
 
     companion object {
-        const val TAG = "MainActivityTAG"
+        const val TAG = "MainActivityCHECKTAG"
         const val RECORD_AUDIO = 1
+    }
+
+    fun testSlideClick(view: View) {
+        if(switch) {
+            binding.viewPager.currentItem = 1
+            switch = false
+        } else {
+            binding.viewPager.currentItem = 0
+            switch = true
+        }
+
+
     }
 }

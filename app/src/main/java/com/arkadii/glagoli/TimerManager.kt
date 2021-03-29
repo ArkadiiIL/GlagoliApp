@@ -6,15 +6,14 @@ import androidx.appcompat.app.AppCompatActivity
 import java.util.*
 import kotlin.math.roundToInt
 
-class TimerManager(private val timeText: TextView,
-                   private val appCompatActivity: AppCompatActivity) {
+class TimerManager(private val appCompatActivity: AppCompatActivity) {
 
     private val timer = Timer()
     private var time = 0.0
     private var timerTask: TimerTask? = null
     private var isStarted = false
 
-    fun start() {
+    fun start(timeText: TextView) {
         Log.i(TAG, "Start timer")
         isStarted = true
         timerTask = object: TimerTask() {
@@ -30,7 +29,7 @@ class TimerManager(private val timeText: TextView,
         timer.scheduleAtFixedRate(timerTask, 0, 1000)
     }
 
-    fun stop() {
+    fun stop(timeText: TextView) {
         Log.i(TAG, "Stop timer")
         timerTask?.cancel()
         time = 0.0
@@ -50,6 +49,6 @@ class TimerManager(private val timeText: TextView,
     }
 
     companion object {
-        const val TAG = "TimeManagerTAG"
+        const val TAG = "TimeManagerCHECKTAG"
     }
 }
