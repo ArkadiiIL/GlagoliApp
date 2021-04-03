@@ -1,4 +1,4 @@
-package com.arkadii.glagoli
+package com.arkadii.glagoli.record
 
 import android.util.Log
 import android.widget.TextView

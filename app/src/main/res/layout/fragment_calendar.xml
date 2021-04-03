@@ -1,7 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <Button
+            android:layout_marginStart="30dp"
+            android:background="@android:color/transparent"
+            android:text="&lt;-"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:id="@+id/nextMonthButton"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"/>
+
+        <TextView
+            android:id="@+id/twDate"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            />
+
+        <Button
+            android:layout_marginEnd="30dp"
+            android:background="@android:color/transparent"
+            android:text="-&gt;"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:id="@+id/previousMonthButton"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+        <TextView
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:text="@string/monday_EEE"
+            android:textColor="@color/black"
+            android:gravity="center"
+            />
+        <TextView
+            android:layout_marginStart="5dp"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:text="@string/tuesday_EEE"
+            android:textColor="@color/black"
+            android:gravity="center"
+            />
+        <TextView
+            android:layout_marginStart="5dp"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:text="@string/wednesday_EEE"
+            android:textColor="@color/black"
+            android:gravity="center"
+            />
+        <TextView
+            android:layout_marginStart="5dp"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:text="@string/thursday_EEE"
+            android:textColor="@color/black"
+            android:gravity="center"
+            />
+        <TextView
+            android:layout_marginStart="5dp"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:text="@string/friday_EEE"
+            android:textColor="@color/black"
+            android:gravity="center"
+            />
+        <TextView
+            android:layout_marginStart="5dp"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:text="@string/saturday_EEE"
+            android:textColor="@color/black"
+            android:gravity="center"
+            />
+        <TextView
+            android:layout_marginStart="5dp"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:text="@string/sunday_EEE"
+            android:textColor="@color/black"
+            android:gravity="center"
+            />
+    </LinearLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvDays"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </androidx.recyclerview.widget.RecyclerView>
+</LinearLayout>

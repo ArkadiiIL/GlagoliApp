@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+        <string name="monday_EEE">MON</string>
+        <string name="tuesday_EEE">TUE</string>
+        <string name="wednesday_EEE">WED</string>
+        <string name="thursday_EEE">THU</string>
+        <string name="friday_EEE">FRI</string>
+        <string name="saturday_EEE">SAT</string>
+        <string name="sunday_EEE">SUN</string>
+</resources>

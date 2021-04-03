@@ -1,4 +1,4 @@
-package com.arkadii.glagoli
+package com.arkadii.glagoli.record
 
 import android.content.Context
 import android.media.MediaRecorder

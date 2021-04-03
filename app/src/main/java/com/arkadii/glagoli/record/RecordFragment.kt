@@ -1,4 +1,4 @@
-package com.arkadii.glagoli
+package com.arkadii.glagoli.record
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -9,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.arkadii.glagoli.MainActivity
+import com.arkadii.glagoli.R
 import com.arkadii.glagoli.databinding.FragmentRecordBinding
 
 class RecordFragment : Fragment() {
@@ -36,14 +38,14 @@ class RecordFragment : Fragment() {
 
 
     private fun init() {
-        val context = activity
-        if(context != null) {
+        val fActivity = activity
+        if(fActivity != null) {
             Log.v(MainActivity.TAG, "Init MediaRecorderManager")
-            mediaRecorderManager = MediaRecorderManager(context.applicationContext)
+            mediaRecorderManager = MediaRecorderManager(fActivity.applicationContext)
 
-            if(context is AppCompatActivity) {
+            if(fActivity is AppCompatActivity) {
                 Log.v(MainActivity.TAG, "Init TimeManager")
-                timerManager = TimerManager(context)
+                timerManager = TimerManager(fActivity)
             } else {
                 Log.e(TAG, "Context is not AppCompatActivity")
             }
