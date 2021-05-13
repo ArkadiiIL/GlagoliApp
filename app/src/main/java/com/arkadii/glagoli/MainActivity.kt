@@ -1,9 +1,7 @@
 package com.arkadii.glagoli
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
-import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -37,7 +35,7 @@ class MainActivity : AppCompatActivity(),  ActivityCompat.OnRequestPermissionsRe
         permissionHelper = PermissionHelper(this, binding.root)
 
         Log.v(TAG, "Init pager adapter")
-        binding.viewPager.adapter = ViewPageAdapter(this)
+        binding.viewPager.adapter = ViewPageAdapter(this, binding.viewPager)
         binding.viewPager.currentItem = 0
     }
 
@@ -71,7 +69,5 @@ class MainActivity : AppCompatActivity(),  ActivityCompat.OnRequestPermissionsRe
             binding.viewPager.currentItem = 0
             switch = true
         }
-
-
     }
 }

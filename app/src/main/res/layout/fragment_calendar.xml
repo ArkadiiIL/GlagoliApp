@@ -15,7 +15,7 @@
             android:text="&lt;-"
             android:textColor="@color/black"
             android:textStyle="bold"
-            android:id="@+id/nextMonthButton"
+            android:id="@+id/previousMonthButton"
             android:layout_width="50dp"
             android:layout_height="match_parent"/>
 
@@ -24,6 +24,10 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:gravity="center"
             />
 
         <Button
@@ -32,7 +36,7 @@
             android:text="-&gt;"
             android:textColor="@color/black"
             android:textStyle="bold"
-            android:id="@+id/previousMonthButton"
+            android:id="@+id/nextMonthButton"
             android:layout_width="50dp"
             android:layout_height="match_parent"/>
     </LinearLayout>
@@ -98,6 +102,8 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvDays"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        >
     </androidx.recyclerview.widget.RecyclerView>
 </LinearLayout>

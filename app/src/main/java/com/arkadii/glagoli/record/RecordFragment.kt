@@ -1,24 +1,31 @@
 package com.arkadii.glagoli.record
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.viewpager2.widget.ViewPager2
 import com.arkadii.glagoli.MainActivity
 import com.arkadii.glagoli.R
 import com.arkadii.glagoli.databinding.FragmentRecordBinding
+import com.arkadii.glagoli.extensions.toPx
+import kotlin.math.abs
 
-class RecordFragment : Fragment() {
+class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
     private var _binding: FragmentRecordBinding? = null
     private val binding get() = _binding ?: error("NullPointerException in RecordFragment")
     private lateinit var mediaRecorderManager: MediaRecorderManager
     private lateinit var timerManager: TimerManager
-    var record = true
+    private var record = true
+    private var buttonStartX = 0f
+    private var buttonStartY = 0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +42,7 @@ class RecordFragment : Fragment() {
         setListeners()
         return binding.root
     }
+
 
 
     private fun init() {
@@ -57,19 +65,65 @@ class RecordFragment : Fragment() {
     @SuppressLint("ClickableViewAccessibility")
     private fun setListeners() {
         Log.v(MainActivity.TAG, "Set onTouchListener in startButton")
-        binding.buttonStart.setOnTouchListener { _, event ->
-            if(event.action == MotionEvent.ACTION_DOWN && record) {
-                mediaRecorderManager.startRecording()
-                timerManager.start(binding.textTime)
-                binding.buttonStart.setImageResource(R.drawable.ic_action_stop)
-                binding.buttonStart.customSize = 180
-                record = false
-            } else if(event.action == MotionEvent.ACTION_UP && !record) {
-                mediaRecorderManager.stopRecording()
-                timerManager.stop(binding.textTime)
-                binding.buttonStart.setImageResource(R.drawable.ic_action_play)
-                binding.buttonStart.customSize = 150
-                record = true
+        binding.buttonStart.setOnTouchListener { view, event ->
+            val uncheckedParent = view.parent
+            if(uncheckedParent is View) {
+                val parentLocation = IntArray(2)
+                uncheckedParent.getLocationOnScreen(parentLocation)
+
+                if (event.action == MotionEvent.ACTION_DOWN && record) {
+
+                    Log.i(TAG, "ACTION_DOWN with ButtonStart")
+
+                    viewPager.isUserInputEnabled = false
+
+                    mediaRecorderManager.startRecording()
+                    timerManager.start(binding.textTime)
+                    binding.buttonStart.setImageResource(R.drawable.ic_action_stop)
+
+                    val location = IntArray(2)
+                    view.getLocationInWindow(location)
+                    buttonStartX = location[0].toFloat()
+                    buttonStartY = location[1].toFloat()
+                    binding.buttonStart.customSize = 65.toPx()
+                    Log.i(TAG, "ButtonStart animation start with x = $buttonStartX y = $buttonStartY")
+
+                    record = false
+
+                } else if (event.action == MotionEvent.ACTION_UP && !record) {
+
+                    Log.i(TAG, "ACTION_UP with ButtonStart")
+
+                    mediaRecorderManager.stopRecording()
+                    timerManager.stop(binding.textTime)
+                    binding.buttonStart.setImageResource(R.drawable.ic_action_play)
+                    binding.buttonStart.customSize = 56.toPx()
+                    record = true
+                    viewPager.isUserInputEnabled = true
+
+                    binding.buttonStart.animate().let { animator ->
+                        animator.x(abs(buttonStartX - (9.toPx()/2)))
+                        animator.y(abs(buttonStartY - parentLocation[1]))
+                        animator.duration = 0
+                        animator.start()
+                    }
+
+                } else if (event.action == MotionEvent.ACTION_MOVE) {
+
+                    Log.i(TAG, "ACTION_MOVE with ButtonStart")
+
+                    binding.buttonStart.animate().let { animator ->
+                        val targetX = abs(event.rawX - 28.toPx() - parentLocation[0])
+                        val targetY = abs(event.rawY - 28.toPx() - parentLocation[1])
+
+                        Log.i(TAG, "ButtonStart animation move to x = $targetX, y = $targetY ")
+
+                        animator.x(targetX)
+                        animator.y(targetY)
+                        animator.duration = 0
+                        animator.start()
+                    }
+                }
             }
             false
         }
@@ -92,7 +146,4 @@ class RecordFragment : Fragment() {
     companion object {
         const val TAG = "RecordFragmentCHECKTAG"
     }
-
-
-
 }

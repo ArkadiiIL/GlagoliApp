@@ -3,24 +3,31 @@ package com.arkadii.glagoli.calendar
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.text.SimpleDateFormat
 import java.util.*
 
 class CalendarManager(private val context: FragmentActivity,
                       private val rv: RecyclerView) {
+
     private var currentCalendar = Calendar.getInstance()
+    private val formatter = SimpleDateFormat("MMM yyyy", Locale.getDefault())
+    private var adapter: CalendarAdapter
 
-    fun createCalendar() {
+    init {
+        Log.v(TAG, "Init CalendarManager")
+        adapter = CalendarAdapter(getDays())
         rv.layoutManager = getLayoutManager()
-        rv.adapter = CalendarAdapter(getDays())
-
+        rv.adapter = adapter
     }
+
 
     private fun getLayoutManager(): RecyclerView.LayoutManager {
         return GridLayoutManager(context, 7)
     }
 
-    private fun getDays(): List<Day> {
+    private fun getDays(): MutableList<Day> {
         val calendar = Calendar.getInstance()
         calendar.time = currentCalendar.time
         val daysOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
@@ -45,22 +52,27 @@ class CalendarManager(private val context: FragmentActivity,
 
     fun plusMonth() {
         currentCalendar.add(Calendar.MONTH, 1)
-        rv.adapter = CalendarAdapter(getDays())
-        rv.adapter = CalendarAdapter(getDays())
+        adapter.updateCalendar(getDays())
+
     }
 
     fun minusMonth() {
         currentCalendar.add(Calendar.MONTH, -1)
-        rv.adapter = CalendarAdapter(getDays())
-        rv.adapter = CalendarAdapter(getDays())
+        adapter.updateCalendar(getDays())
     }
 
     fun plusYear() {
-
+        currentCalendar.add(Calendar.YEAR, 1)
+        adapter.updateCalendar(getDays())
     }
 
     fun minusYear() {
+        currentCalendar.add(Calendar.YEAR, -1)
+        adapter.updateCalendar(getDays())
+    }
 
+    fun getDateText(): String {
+        return formatter.format(currentCalendar.time)
     }
 
     private fun updateCalendar() {
