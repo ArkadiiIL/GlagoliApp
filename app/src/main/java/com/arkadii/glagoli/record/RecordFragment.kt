@@ -3,6 +3,7 @@ package com.arkadii.glagoli.record
 import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
+import android.transition.Visibility
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -24,6 +25,7 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
     private lateinit var mediaRecorderManager: MediaRecorderManager
     private lateinit var timerManager: TimerManager
     private var record = true
+    private var buttonMove = ButtonMove.DEFAULT
     private var buttonStartX = 0f
     private var buttonStartY = 0f
 
@@ -88,6 +90,9 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
                     binding.buttonStart.customSize = 65.toPx()
                     Log.i(TAG, "ButtonStart animation start with x = $buttonStartX y = $buttonStartY")
 
+                    binding.deleteIcon.visibility = View.VISIBLE
+                    binding.saveIcon.visibility = View.VISIBLE
+
                     record = false
 
                 } else if (event.action == MotionEvent.ACTION_UP && !record) {
@@ -108,20 +113,47 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
                         animator.start()
                     }
 
+                    binding.deleteIcon.visibility = View.GONE
+                    binding.saveIcon.visibility = View.GONE
+
+                    buttonMove = ButtonMove.DEFAULT
+
                 } else if (event.action == MotionEvent.ACTION_MOVE) {
 
                     Log.i(TAG, "ACTION_MOVE with ButtonStart")
 
-                    binding.buttonStart.animate().let { animator ->
-                        val targetX = abs(event.rawX - 28.toPx() - parentLocation[0])
-                        val targetY = abs(event.rawY - 28.toPx() - parentLocation[1])
+                    when(buttonMove) {
+                        ButtonMove.DEFAULT -> {
+                            val shiftX = buttonStartX - event.rawX
+                            val shiftY = buttonStartY - event.rawY
+                            Log.i(TAG, "shiftX  = $shiftX, shiftY = $shiftY" )
 
-                        Log.i(TAG, "ButtonStart animation move to x = $targetX, y = $targetY ")
-
-                        animator.x(targetX)
-                        animator.y(targetY)
-                        animator.duration = 0
-                        animator.start()
+                            if(shiftX > 0.1 && shiftX > shiftY) buttonMove = ButtonMove.TO_LEFT
+                            else if(shiftY > 0.1) buttonMove = ButtonMove.TO_UP
+                            Log.i(TAG, "buttonMOVE = $buttonMove")
+                        }
+                        ButtonMove.TO_LEFT -> {
+                            if(event.rawX < abs(buttonStartX + 33.toPx())) {
+                                binding.buttonStart.animate().let { animator ->
+                                    val targetX = abs(event.rawX - 28.toPx() - parentLocation[0])
+                                    animator.x(targetX)
+                                    animator.duration = 0
+                                    animator.start()
+                                    Log.i(TAG, "ButtonStart animation move to x = $targetX")
+                                }
+                            } else buttonMove = ButtonMove.DEFAULT
+                        }
+                        ButtonMove.TO_UP -> {
+                            if(event.rawY < (buttonStartY + 33.toPx())) {
+                                binding.buttonStart.animate().let { animator ->
+                                    val targetY = abs(event.rawY - 28.toPx() - parentLocation[1])
+                                    animator.y(targetY)
+                                    animator.duration = 0
+                                    animator.start()
+                                    Log.i(TAG, "ButtonStart animation move to y = $targetY")
+                                }
+                            } else buttonMove = ButtonMove.DEFAULT
+                        }
                     }
                 }
             }
