@@ -1,31 +1,35 @@
 package com.arkadii.glagoli.record
 
 import android.annotation.SuppressLint
-import android.os.Build
+import android.graphics.drawable.ColorDrawable
+import android.media.AudioAttributes
 import android.os.Bundle
-import android.transition.Visibility
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.arkadii.glagoli.MainActivity
 import com.arkadii.glagoli.R
 import com.arkadii.glagoli.databinding.FragmentRecordBinding
+import com.arkadii.glagoli.databinding.SetDialogBinding
 import com.arkadii.glagoli.extensions.toPx
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlin.math.abs
 
 class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
     private var _binding: FragmentRecordBinding? = null
     private val binding get() = _binding ?: error("NullPointerException in RecordFragment")
     private lateinit var mediaRecorderManager: MediaRecorderManager
+    private lateinit var mediaPlayerManager: MediaPlayerManager
     private lateinit var timerManager: TimerManager
     private var record = true
     private var buttonMove = ButtonMove.DEFAULT
+    private var isButtonDown = false
     private var buttonStartX = 0f
     private var buttonStartY = 0f
 
@@ -50,8 +54,10 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
     private fun init() {
         val fActivity = activity
         if(fActivity != null) {
-            Log.v(MainActivity.TAG, "Init MediaRecorderManager")
+            Log.v(TAG, "Init MediaRecorderManager")
             mediaRecorderManager = MediaRecorderManager(fActivity.applicationContext)
+            Log.v(TAG, "Init MediaPlayerManager")
+            mediaPlayerManager = MediaPlayerManager()
 
             if(fActivity is AppCompatActivity) {
                 Log.v(MainActivity.TAG, "Init TimeManager")
@@ -66,99 +72,159 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setListeners() {
-        Log.v(MainActivity.TAG, "Set onTouchListener in startButton")
+        Log.v(TAG, "Set onTouchListener in startButton")
         binding.buttonStart.setOnTouchListener { view, event ->
             val uncheckedParent = view.parent
             if(uncheckedParent is View) {
                 val parentLocation = IntArray(2)
                 uncheckedParent.getLocationOnScreen(parentLocation)
 
-                if (event.action == MotionEvent.ACTION_DOWN && record) {
+                if (event.action == MotionEvent.ACTION_DOWN && record && !isButtonDown) {
 
                     Log.i(TAG, "ACTION_DOWN with ButtonStart")
-
-                    viewPager.isUserInputEnabled = false
-
-                    mediaRecorderManager.startRecording()
-                    timerManager.start(binding.textTime)
-                    binding.buttonStart.setImageResource(R.drawable.ic_action_stop)
-
-                    val location = IntArray(2)
-                    view.getLocationInWindow(location)
-                    buttonStartX = location[0].toFloat()
-                    buttonStartY = location[1].toFloat()
-                    binding.buttonStart.customSize = 65.toPx()
-                    Log.i(TAG, "ButtonStart animation start with x = $buttonStartX y = $buttonStartY")
-
-                    binding.deleteIcon.visibility = View.VISIBLE
-                    binding.saveIcon.visibility = View.VISIBLE
-
-                    record = false
-
-                } else if (event.action == MotionEvent.ACTION_UP && !record) {
+                    actionDown(view)
+                } else if (event.action == MotionEvent.ACTION_UP && !record && isButtonDown) {
 
                     Log.i(TAG, "ACTION_UP with ButtonStart")
-
-                    mediaRecorderManager.stopRecording()
-                    timerManager.stop(binding.textTime)
-                    binding.buttonStart.setImageResource(R.drawable.ic_action_play)
-                    binding.buttonStart.customSize = 56.toPx()
-                    record = true
-                    viewPager.isUserInputEnabled = true
-
-                    binding.buttonStart.animate().let { animator ->
-                        animator.x(abs(buttonStartX - (9.toPx()/2)))
-                        animator.y(abs(buttonStartY - parentLocation[1]))
-                        animator.duration = 0
-                        animator.start()
-                    }
-
-                    binding.deleteIcon.visibility = View.GONE
-                    binding.saveIcon.visibility = View.GONE
-
-                    buttonMove = ButtonMove.DEFAULT
-
-                } else if (event.action == MotionEvent.ACTION_MOVE) {
+                    actionUp(view, parentLocation[1])
+                } else if (event.action == MotionEvent.ACTION_MOVE && isButtonDown) {
 
                     Log.i(TAG, "ACTION_MOVE with ButtonStart")
-
-                    when(buttonMove) {
-                        ButtonMove.DEFAULT -> {
-                            val shiftX = buttonStartX - event.rawX
-                            val shiftY = buttonStartY - event.rawY
-                            Log.i(TAG, "shiftX  = $shiftX, shiftY = $shiftY" )
-
-                            if(shiftX > 0.1 && shiftX > shiftY) buttonMove = ButtonMove.TO_LEFT
-                            else if(shiftY > 0.1) buttonMove = ButtonMove.TO_UP
-                            Log.i(TAG, "buttonMOVE = $buttonMove")
-                        }
-                        ButtonMove.TO_LEFT -> {
-                            if(event.rawX < abs(buttonStartX + 33.toPx())) {
-                                binding.buttonStart.animate().let { animator ->
-                                    val targetX = abs(event.rawX - 28.toPx() - parentLocation[0])
-                                    animator.x(targetX)
-                                    animator.duration = 0
-                                    animator.start()
-                                    Log.i(TAG, "ButtonStart animation move to x = $targetX")
-                                }
-                            } else buttonMove = ButtonMove.DEFAULT
-                        }
-                        ButtonMove.TO_UP -> {
-                            if(event.rawY < (buttonStartY + 33.toPx())) {
-                                binding.buttonStart.animate().let { animator ->
-                                    val targetY = abs(event.rawY - 28.toPx() - parentLocation[1])
-                                    animator.y(targetY)
-                                    animator.duration = 0
-                                    animator.start()
-                                    Log.i(TAG, "ButtonStart animation move to y = $targetY")
-                                }
-                            } else buttonMove = ButtonMove.DEFAULT
-                        }
-                    }
+                    actionMove(view, event, parentLocation[0], parentLocation[1])
                 }
             }
             false
         }
+    }
+
+    private fun actionDown(view: View) {
+
+        viewPager.isUserInputEnabled = false
+
+        mediaRecorderManager.startRecording()
+        timerManager.start(binding.textTime)
+        binding.buttonStart.setImageResource(R.drawable.ic_action_stop)
+
+        val location = IntArray(2)
+        view.getLocationInWindow(location)
+        buttonStartX = location[0].toFloat()
+        buttonStartY = location[1].toFloat()
+        binding.buttonStart.customSize = 65.toPx()
+
+        binding.deleteIcon.visibility = View.VISIBLE
+        binding.saveIcon.visibility = View.VISIBLE
+
+        record = false
+
+        isButtonDown = true
+    }
+
+    private fun actionUp(view: View, parentY: Int) {
+        mediaRecorderManager.stopRecording()
+        timerManager.stop(binding.textTime)
+        binding.buttonStart.setImageResource(R.drawable.ic_action_play)
+        binding.buttonStart.customSize = 56.toPx()
+        record = true
+        viewPager.isUserInputEnabled = true
+
+        binding.buttonStart.animate().let { animator ->
+            animator.x(abs(buttonStartX - (9.toPx()/2)))
+            animator.y(abs(buttonStartY - parentY))
+            animator.duration = 0
+            animator.start()
+        }
+
+        binding.deleteIcon.visibility = View.GONE
+        binding.saveIcon.visibility = View.GONE
+
+        buttonMove = ButtonMove.DEFAULT
+        isButtonDown = false
+        showSetDialog()
+    }
+
+    private fun actionMove(view: View,
+                           event: MotionEvent,
+                           parentX: Int,
+                           parentY: Int) {
+        when(buttonMove) {
+            ButtonMove.DEFAULT -> {
+                val shiftX = buttonStartX - event.rawX
+                val shiftY = buttonStartY - event.rawY
+                Log.i(TAG, "shiftX  = $shiftX, shiftY = $shiftY" )
+
+                if(shiftX > 0.1 && shiftX > shiftY) buttonMove = ButtonMove.TO_LEFT
+                else if(shiftY > 0.1) buttonMove = ButtonMove.TO_UP
+                Log.i(TAG, "buttonMOVE = $buttonMove")
+            }
+            ButtonMove.TO_LEFT -> {
+                when {
+                    event.rawX >= abs(95.toPx()) -> {
+                        if(event.rawX < abs(buttonStartX + 33.toPx())) {
+
+                            val targetX = abs(event.rawX - 28.toPx() - parentX)
+                            val targetY = abs(buttonStartY - parentY)
+                            animate(binding.buttonStart, targetX, targetY)
+                        } else buttonMove = ButtonMove.DEFAULT
+                    }
+                    event.rawX < abs(95.toPx()) -> {
+                        isButtonDown = false
+                        actionUp(view, parentY)
+                        buttonMove = ButtonMove.DEFAULT
+                    }
+                }
+            }
+            ButtonMove.TO_UP -> {
+                when {
+                    event.rawY <= (buttonStartY - 75.toPx())-> {
+                        isButtonDown = false
+                        actionUp(view, parentY)
+                        buttonMove = ButtonMove.DEFAULT
+                    }
+                    event.rawY < (buttonStartY + 33.toPx()) -> {
+                        val targetX = abs(buttonStartX - (9.toPx()/2))
+                        val targetY = abs(event.rawY - 28.toPx() - parentY)
+                        animate(binding.buttonStart, targetX, targetY)
+                    }
+                    else -> buttonMove = ButtonMove.DEFAULT
+                }
+            }
+        }
+    }
+
+    private fun animate(button: FloatingActionButton,
+                        x: Float,
+                        y: Float,
+                        duration: Long = 0) {
+            button.animate().let { animator ->
+                animator.y(y)
+                animator.x(x)
+                animator.duration = duration
+                animator.start()
+            }
+        Log.i(TAG, "StartButton animation move " +
+                "to x = $x,  y = $y, duration = $duration")
+    }
+
+    private fun showSetDialog() {
+        val builder = AlertDialog.Builder(this.requireContext())
+        val setDialogBinding = SetDialogBinding.inflate(
+                LayoutInflater.from(this.requireContext())
+        )
+        setDialogBinding.audioNameText.text = "Hello World"
+        setDialogBinding.playAudioBtn.setOnClickListener {
+            mediaPlayerManager.initMediaPlayer(
+                        AudioAttributes.Builder()
+                                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                                .setUsage(AudioAttributes.USAGE_MEDIA)
+                                .build())
+            mediaPlayerManager.play(mediaRecorderManager.currentRecord)
+        }
+
+        builder.setView(setDialogBinding.root)
+        val dialog = builder.create()
+        dialog.window?.setBackgroundDrawable(ColorDrawable(0))
+        Log.i(TAG, "Show set dialog")
+        dialog.show()
     }
 
     override fun onDestroyView() {
@@ -172,6 +238,7 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
         Log.d(TAG, "Stop record and timer in onDestroy")
         mediaRecorderManager.stopRecording()
         record = true
+        mediaPlayerManager.closeMediaPlayer()
         timerManager.stop(binding.textTime)
     }
 

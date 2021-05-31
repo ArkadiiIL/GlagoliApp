@@ -10,6 +10,9 @@
         without record audio permission. Please will grant record audio or close app</string>
     <string name="to_settings">Open permission settings</string>
     <string name="close_app">Close app</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="set_audio">SET</string>
+    <string name="rename_audio">RENAME</string>
+    <string name="delete_audio">DELETE</string>
+
+
 </resources>

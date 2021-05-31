@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/dialog_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="20dp"
+    android:padding="20dp">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="150dp"
+        android:layout_height="200dp"
+        android:id="@+id/menu_dialog"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="150dp"
+        android:background="@drawable/set_dialog_background"
+        >
+        <TextView
+            android:id="@+id/audio_name_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="20dp"
+            />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/set_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/set_audio"
+            app:layout_constraintTop_toBottomOf="@id/audio_name_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="5dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/rename_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/rename_audio"
+            app:layout_constraintTop_toBottomOf="@id/set_btn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="5dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/delete_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/delete_audio"
+            app:layout_constraintTop_toBottomOf="@id/rename_btn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="5dp" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <Button
+        android:id="@+id/play_audio_btn"
+        android:layout_width="100dp"
+        android:layout_height="200dp"
+        android:drawableEnd="@drawable/ic_button_play"
+        app:layout_constraintStart_toEndOf="@id/menu_dialog"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="150dp"
+        android:background="@drawable/play_button_background"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
