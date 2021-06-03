@@ -5,10 +5,8 @@ import android.graphics.drawable.ColorDrawable
 import android.media.AudioAttributes
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.view.inputmethod.EditorInfo
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -17,9 +15,13 @@ import com.arkadii.glagoli.MainActivity
 import com.arkadii.glagoli.R
 import com.arkadii.glagoli.databinding.FragmentRecordBinding
 import com.arkadii.glagoli.databinding.SetDialogBinding
+import com.arkadii.glagoli.extensions.getRecordName
+import com.arkadii.glagoli.extensions.setRecordFormat
 import com.arkadii.glagoli.extensions.toPx
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.io.File
 import kotlin.math.abs
+import kotlin.math.truncate
 
 class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
     private var _binding: FragmentRecordBinding? = null
@@ -27,11 +29,15 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
     private lateinit var mediaRecorderManager: MediaRecorderManager
     private lateinit var mediaPlayerManager: MediaPlayerManager
     private lateinit var timerManager: TimerManager
+    private lateinit var setDialogBinding: SetDialogBinding
     private var record = true
     private var buttonMove = ButtonMove.DEFAULT
     private var isButtonDown = false
     private var buttonStartX = 0f
     private var buttonStartY = 0f
+    private lateinit var path: String
+    private var currentRecordPath = ""
+    private lateinit var dialog: AlertDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,18 +55,25 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
         return binding.root
     }
 
-
-
     private fun init() {
         val fActivity = activity
         if(fActivity != null) {
-            Log.v(TAG, "Init MediaRecorderManager")
+            Log.i(TAG, "Init MediaRecorderManager")
             mediaRecorderManager = MediaRecorderManager(fActivity.applicationContext)
-            Log.v(TAG, "Init MediaPlayerManager")
+            Log.i(TAG, "Init MediaPlayerManager")
             mediaPlayerManager = MediaPlayerManager()
+            Log.i(TAG, "Init SetDialogBinding")
+            setDialogBinding = SetDialogBinding.inflate(
+                LayoutInflater.from(this.requireContext())
+            )
+
+            Log.i(TAG, "Init Path")
+            path = "${context?.externalCacheDir?.absolutePath}/"
+
+
 
             if(fActivity is AppCompatActivity) {
-                Log.v(MainActivity.TAG, "Init TimeManager")
+                Log.i(MainActivity.TAG, "Init TimeManager")
                 timerManager = TimerManager(fActivity)
             } else {
                 Log.e(TAG, "Context is not AppCompatActivity")
@@ -70,9 +83,18 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     private fun setListeners() {
-        Log.v(TAG, "Set onTouchListener in startButton")
+        setButtonStartListener()
+        setRenameButtonListener()
+        setCancelRenameButtonListener()
+        setAcceptRenameButtonListener()
+        setEditNameListener()
+        setDeleteButtonListener()
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setButtonStartListener() {
+        Log.i(TAG, "Set onTouchListener in startButton")
         binding.buttonStart.setOnTouchListener { view, event ->
             val uncheckedParent = view.parent
             if(uncheckedParent is View) {
@@ -86,7 +108,7 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
                 } else if (event.action == MotionEvent.ACTION_UP && !record && isButtonDown) {
 
                     Log.i(TAG, "ACTION_UP with ButtonStart")
-                    actionUp(view, parentLocation[1])
+                    actionUp(parentLocation[1], true)
                 } else if (event.action == MotionEvent.ACTION_MOVE && isButtonDown) {
 
                     Log.i(TAG, "ACTION_MOVE with ButtonStart")
@@ -97,8 +119,99 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
         }
     }
 
-    private fun actionDown(view: View) {
+    private fun setRenameButtonListener() {
+        Log.i(TAG, "Set onClickListener in RenameButton")
+        setDialogBinding.renameBtn.setOnClickListener{
+            setDialogBinding.editName.visibility = View.VISIBLE
+            setDialogBinding.cancelRenameBtn.visibility = View.VISIBLE
+            setDialogBinding.acceptRenameBtn.visibility = View.VISIBLE
+        }
+    }
 
+    private fun setCancelRenameButtonListener() {
+        setDialogBinding.cancelRenameBtn.setOnClickListener {
+            closeEditName()
+        }
+    }
+
+    private fun setAcceptRenameButtonListener() {
+        setDialogBinding.acceptRenameBtn.setOnClickListener {
+            acceptRenameButton()
+        }
+    }
+    private fun setEditNameListener() {
+        setDialogBinding.editName.setOnEditorActionListener { _, actionId, _ ->
+            if(actionId == EditorInfo.IME_ACTION_DONE) {
+                acceptRenameButton()
+            }
+             false
+        }
+    }
+
+    private fun acceptRenameButton(): Boolean {
+        val text = setDialogBinding.editName.text.toString()
+        return when {
+            text == "" -> {
+                Log.i(TAG, "Text for rename record is empty")
+                setDialogBinding.editName.error = getString(R.string.cannot_be_empty)
+                false
+            }
+            text.length > 50 -> {
+                Log.i(TAG, "Text for rename is greater than 50 symbols")
+                setDialogBinding.editName.error = getString(R.string.length_is_greater)
+                false
+            }
+            else -> {
+                val file = File(currentRecordPath)
+                val pathToRename = "$path${text.setRecordFormat()}"
+                val fileToRename = File(pathToRename)
+                Log.d(TAG, "File path = ${file.absolutePath}")
+                Log.d(TAG, "RenameFile path = ${fileToRename.absolutePath}")
+                if(fileToRename.exists()) {
+                    Log.i(TAG, "File exists")
+                    setDialogBinding.editName.error = getString(R.string.file_exist)
+                    false
+                } else {
+                    Log.i(TAG, "Rename file")
+                    file.renameTo(fileToRename)
+                    currentRecordPath = pathToRename
+                    setDialogBinding.audioNameText.text = text
+                    closeEditName()
+                    true
+                }
+            }
+        }
+    }
+
+    private fun closeEditName() {
+        setDialogBinding.editName.text.clear()
+        setDialogBinding.editName.visibility = View.GONE
+        setDialogBinding.cancelRenameBtn.visibility = View.GONE
+        setDialogBinding.acceptRenameBtn.visibility = View.GONE
+    }
+
+    private fun setDeleteButtonListener() {
+        setDialogBinding.deleteBtn.setOnClickListener {
+            deleteCurrentRecord()
+            Log.i(TAG, "CLose SetDialog")
+            dialog.cancel()
+        }
+    }
+
+    private fun deleteCurrentRecord(): Boolean {
+        val file = File(currentRecordPath)
+        return if(file.exists()) {
+            Log.i(TAG, "Delete current file record $currentRecordPath")
+            file.delete()
+            currentRecordPath = ""
+            true
+        } else {
+            Log.w(TAG, "The current file has been deleted $currentRecordPath" )
+            false
+        }
+    }
+
+    private fun actionDown(view: View) {
         viewPager.isUserInputEnabled = false
 
         mediaRecorderManager.startRecording()
@@ -119,7 +232,7 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
         isButtonDown = true
     }
 
-    private fun actionUp(view: View, parentY: Int) {
+    private fun actionUp(parentY: Int, callSetDialog: Boolean) {
         mediaRecorderManager.stopRecording()
         timerManager.stop(binding.textTime)
         binding.buttonStart.setImageResource(R.drawable.ic_action_play)
@@ -139,7 +252,10 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
 
         buttonMove = ButtonMove.DEFAULT
         isButtonDown = false
-        showSetDialog()
+        currentRecordPath = mediaRecorderManager.currentRecordPath
+        if(callSetDialog) {
+            showSetDialog()
+        }
     }
 
     private fun actionMove(view: View,
@@ -168,7 +284,8 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
                     }
                     event.rawX < abs(95.toPx()) -> {
                         isButtonDown = false
-                        actionUp(view, parentY)
+                        actionUp(parentY, false)
+                        deleteCurrentRecord()
                         buttonMove = ButtonMove.DEFAULT
                     }
                 }
@@ -177,7 +294,7 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
                 when {
                     event.rawY <= (buttonStartY - 75.toPx())-> {
                         isButtonDown = false
-                        actionUp(view, parentY)
+                        actionUp(parentY, false)
                         buttonMove = ButtonMove.DEFAULT
                     }
                     event.rawY < (buttonStartY + 33.toPx()) -> {
@@ -207,23 +324,25 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
 
     private fun showSetDialog() {
         val builder = AlertDialog.Builder(this.requireContext())
-        val setDialogBinding = SetDialogBinding.inflate(
-                LayoutInflater.from(this.requireContext())
-        )
-        setDialogBinding.audioNameText.text = "Hello World"
+        builder.setCancelable(false)
+
+        val file = File(currentRecordPath)
+
+        setDialogBinding.audioNameText.text = file.name.getRecordName()
+        Log.i(TAG, file.name.getRecordName())
         setDialogBinding.playAudioBtn.setOnClickListener {
             mediaPlayerManager.initMediaPlayer(
                         AudioAttributes.Builder()
                                 .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                                 .setUsage(AudioAttributes.USAGE_MEDIA)
                                 .build())
-            mediaPlayerManager.play(mediaRecorderManager.currentRecord)
+            mediaPlayerManager.play(currentRecordPath)
         }
 
         builder.setView(setDialogBinding.root)
-        val dialog = builder.create()
+        dialog = builder.create()
         dialog.window?.setBackgroundDrawable(ColorDrawable(0))
-        Log.i(TAG, "Show set dialog")
+        Log.i(TAG, "Show SetDialog")
         dialog.show()
     }
 
@@ -241,6 +360,7 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
         mediaPlayerManager.closeMediaPlayer()
         timerManager.stop(binding.textTime)
     }
+
 
     companion object {
         const val TAG = "RecordFragmentCHECKTAG"

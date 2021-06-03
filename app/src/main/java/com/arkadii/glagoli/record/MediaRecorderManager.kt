@@ -12,8 +12,9 @@ import java.util.*
 class MediaRecorderManager(private val context: Context) {
     private var recorder: MediaRecorder? = null
     private var startPlayer = false
+    private val path = "${context.externalCacheDir?.absolutePath}/"
     private var fileName = ""
-    var currentRecord = ""
+    var currentRecordPath = ""
         get() {
             if(field == "") throw NotLinkException("Link on currentRecord does not Exist!")
             else return field
@@ -45,7 +46,7 @@ class MediaRecorderManager(private val context: Context) {
                     Log.e(TAG, error.toString())
                 }
             }
-            currentRecord = fileName
+            currentRecordPath = fileName
             recorder = null
             fileName = ""
             startPlayer = false
@@ -55,8 +56,7 @@ class MediaRecorderManager(private val context: Context) {
     private fun initRecorder() {
         Log.i(TAG, "Init recorder")
         fileName =
-            "${context.externalCacheDir?.absolutePath}" +
-                    "/audiorecord-${simpleDateFormat.format(Date())}.m4a"
+            "${path}audiorecord-${simpleDateFormat.format(Date())}.m4a"
         recorder = MediaRecorder().apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
             setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)

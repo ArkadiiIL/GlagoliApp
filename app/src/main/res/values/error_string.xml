@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cannot_be_empty">Field cannot be empty!</string>
+    <string name="length_is_greater">Maximum length is greater than 50 symbols</string>
+    <string name="file_exist">This name already exists</string>
+</resources>

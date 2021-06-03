@@ -13,6 +13,4 @@
     <string name="set_audio">SET</string>
     <string name="rename_audio">RENAME</string>
     <string name="delete_audio">DELETE</string>
-
-
 </resources>
