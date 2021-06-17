@@ -24,7 +24,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="310dp"
         android:layout_marginEnd="110dp"
-        app:layout_constraintEnd_toEndOf="@id/button_start"
+        app:layout_constraintEnd_toEndOf="@id/start_btn"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_time"
         app:srcCompat="@drawable/ic_action_delete_audio"
@@ -43,7 +43,7 @@
         />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/button_start"
+        android:id="@+id/start_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="300dp"

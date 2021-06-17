@@ -4,29 +4,28 @@ import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.util.Log
 
-class MediaPlayerManager() {
+class MediaPlayerManager {
     private var mediaPlayer: MediaPlayer? = null
 
-    fun initMediaPlayer(audioAttributes: AudioAttributes): Boolean  {
+    fun initMediaPlayer(audioAttributes: AudioAttributes, url: String): Boolean  {
         return if(mediaPlayer != null) {
             closeMediaPlayer()
-            initMediaPlayer(audioAttributes)
+            initMediaPlayer(audioAttributes, url)
         } else {
-            Log.i(TAG, "Init MediaPlayer")
+            Log.i(TAG, "Init MediaPlayer with $url")
             mediaPlayer = MediaPlayer()
             mediaPlayer?.setAudioAttributes(audioAttributes)
+            mediaPlayer?.setDataSource(url)
             true
         }
     }
 
-    fun play(url: String) {
-        Log.i(TAG, "MediaPlayer play $url")
+    fun play() {
+        Log.i(TAG, "MediaPlayer play")
         mediaPlayer?.apply {
-            setDataSource(url)
             prepare()
             start()
         }
-
     }
 
     fun stop() {
@@ -40,12 +39,11 @@ class MediaPlayerManager() {
         mediaPlayer = null
     }
 
-
-    fun changeAudioAttributes(audioAttributes: AudioAttributes): Boolean {
-        return if(mediaPlayer != null) {
-            mediaPlayer?.setAudioAttributes(audioAttributes)
-            true
-        } else false
+    fun setCompletionListener(listener: () -> Unit) {
+        mediaPlayer?.setOnCompletionListener {
+            listener()
+            stop()
+        }
     }
 
     companion object {

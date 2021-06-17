@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -31,7 +32,7 @@
             />
 
         <Button
-            android:layout_marginEnd="30dp"
+            android:layout_marginEnd="10dp"
             android:background="@android:color/transparent"
             android:text="-&gt;"
             android:textColor="@color/black"
@@ -40,70 +41,96 @@
             android:layout_width="50dp"
             android:layout_height="match_parent"/>
     </LinearLayout>
-    <LinearLayout
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp">
+        android:layout_height="match_parent"
+        >
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/week_cl"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        >
         <TextView
-            android:layout_width="50dp"
+            android:id="@+id/monday_tv"
+            android:layout_width="40dp"
             android:layout_height="match_parent"
             android:text="@string/monday_EEE"
             android:textColor="@color/black"
             android:gravity="center"
+            app:layout_constraintStart_toStartOf="parent"
             />
         <TextView
-            android:layout_marginStart="5dp"
-            android:layout_width="50dp"
+            android:id="@+id/tuesday_tv"
+            android:layout_width="40dp"
             android:layout_height="match_parent"
             android:text="@string/tuesday_EEE"
             android:textColor="@color/black"
             android:gravity="center"
+            app:layout_constraintStart_toEndOf="@id/monday_tv"
             />
         <TextView
-            android:layout_marginStart="5dp"
-            android:layout_width="50dp"
+            android:id="@+id/wednesday_tv"
+            android:layout_width="40dp"
             android:layout_height="match_parent"
             android:text="@string/wednesday_EEE"
             android:textColor="@color/black"
             android:gravity="center"
+            app:layout_constraintStart_toEndOf="@id/tuesday_tv"
             />
         <TextView
-            android:layout_marginStart="5dp"
-            android:layout_width="50dp"
+            android:id="@+id/thursday_tv"
+            android:layout_width="40dp"
             android:layout_height="match_parent"
             android:text="@string/thursday_EEE"
             android:textColor="@color/black"
             android:gravity="center"
+            app:layout_constraintStart_toEndOf="@id/wednesday_tv"
             />
         <TextView
-            android:layout_marginStart="5dp"
-            android:layout_width="50dp"
+            android:id="@+id/friday_tv"
+            android:layout_width="40dp"
             android:layout_height="match_parent"
             android:text="@string/friday_EEE"
             android:textColor="@color/black"
             android:gravity="center"
+            app:layout_constraintStart_toEndOf="@id/thursday_tv"
             />
         <TextView
-            android:layout_marginStart="5dp"
-            android:layout_width="50dp"
+            android:id="@+id/saturday_tv"
+            android:layout_width="40dp"
             android:layout_height="match_parent"
             android:text="@string/saturday_EEE"
             android:textColor="@color/black"
             android:gravity="center"
+            app:layout_constraintStart_toEndOf="@id/friday_tv"
             />
         <TextView
-            android:layout_marginStart="5dp"
-            android:layout_width="50dp"
+            android:id="@+id/sunday_tv"
+            android:layout_width="40dp"
             android:layout_height="match_parent"
             android:text="@string/sunday_EEE"
             android:textColor="@color/black"
             android:gravity="center"
+            app:layout_constraintStart_toEndOf="@id/saturday_tv"
             />
-    </LinearLayout>
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvDays"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        >
-    </androidx.recyclerview.widget.RecyclerView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/week_cl"
+            app:layout_constraintStart_toStartOf="@+id/week_cl"
+            app:layout_constraintEnd_toEndOf="@+id/week_cl">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvDays"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

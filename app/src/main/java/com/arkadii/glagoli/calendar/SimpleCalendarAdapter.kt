@@ -3,17 +3,19 @@ package com.arkadii.glagoli.calendar
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.marginStart
 import androidx.recyclerview.widget.RecyclerView
 import com.arkadii.glagoli.R
 
-class SimpleCalendarAdapter: RecyclerView.Adapter<CalendarViewHolder>(), CalendarAdapter {
+class SimpleCalendarAdapter():
+        RecyclerView.Adapter<CalendarViewHolder>(), CalendarAdapter {
     private val days = mutableListOf<Day>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CalendarViewHolder {
         Log.v(TAG, "OnCreateViewHolder")
         val inflater = LayoutInflater.from(parent.context)
-        val layoutParams = parent.layoutParams
-        layoutParams.height = (parent.height * 0.166666666).toInt()
+//        val layoutParams = parent.layoutParams
+//        layoutParams.height = (parent.height * 0.166666666).toInt()
         return CalendarViewHolder(inflater.inflate(
                 R.layout.calendar_cell, parent, false))
     }

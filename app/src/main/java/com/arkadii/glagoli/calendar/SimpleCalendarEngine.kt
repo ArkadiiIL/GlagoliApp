@@ -19,9 +19,9 @@ class SimpleCalendarEngine: CalendarEngine {
         return fillDays(calendar, firstOfMonth, allDays)
     }
 
-    private fun fillDays(calendar: java.util.Calendar, firstOfMonth: Int, allDays: Int): MutableList<Day> {
+    private fun fillDays(calendar: Calendar, firstOfMonth: Int, allDays: Int): MutableList<Day> {
         val days = mutableListOf<Day>()
-        for (x in 1..allDays) {
+        for (x in 0..allDays) {
             if(x > firstOfMonth) {
                 days.add(Day(
                         true,
