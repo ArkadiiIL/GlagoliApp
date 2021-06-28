@@ -9,11 +9,26 @@ import com.arkadii.glagoli.record.RecordFragment
 
 class ViewPageAdapter(activity: AppCompatActivity,
                       private val viewPager: ViewPager2): FragmentStateAdapter(activity) {
+   private var calendarFragment: CalendarFragment? = null
+
     override fun getItemCount(): Int = 2
+
+
 
     override fun createFragment(position: Int): Fragment {
         return if (position == 0) RecordFragment(viewPager)
-        else CalendarFragment()
+        else {
+            val calendar = CalendarFragment()
+            calendarFragment = calendar
+            calendar
+        }
     }
+
+    fun setAlarm(recordPath: String) {
+        calendarFragment?.recordPath = recordPath
+        viewPager.currentItem = 1
+    }
+
+
 
 }

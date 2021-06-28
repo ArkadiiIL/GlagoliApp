@@ -15,6 +15,8 @@ class CalendarFragment: Fragment() {
     private val binding get() = _binding ?: error("NullPointerException in CalendarFragment")
     private val metrics = Resources.getSystem().displayMetrics
     private lateinit var calendar: CalendarController
+    var recordPath: String? = null
+
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
@@ -29,7 +31,7 @@ class CalendarFragment: Fragment() {
         val fActivity = activity
         if(fActivity != null) {
             val calendarRealization = SimpleCalendarEngine()
-            val adapter = SimpleCalendarAdapter()
+            val adapter = SimpleCalendarAdapter(requireContext(), requireFragmentManager())
 
             binding.rvDays.adapter = adapter
             binding.rvDays.layoutManager = GridLayoutManager(context, 7 )

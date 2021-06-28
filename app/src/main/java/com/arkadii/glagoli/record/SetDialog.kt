@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.arkadii.glagoli.R
+import com.arkadii.glagoli.ViewPageAdapter
 import com.arkadii.glagoli.databinding.SetDialogBinding
 import com.arkadii.glagoli.extensions.getRecordName
 import com.arkadii.glagoli.extensions.setRecordFormat
@@ -26,7 +27,7 @@ class SetDialog(private val context: Context,
     private lateinit var dialog: AlertDialog
     private val path = "${context.externalCacheDir?.absolutePath}/"
     @Volatile
-    private var play = false
+    private var isPlay = false
 
      fun showSetDialog() {
         val builder = AlertDialog.Builder(context)
@@ -40,8 +41,8 @@ class SetDialog(private val context: Context,
         initMediaPlayer()
         mediaPlayerManager.setCompletionListener {
             Log.d(TAG, "MediaPlayerManagerListener")
-            Log.d(TAG, "play = $play")
-            if(play) {
+            Log.d(TAG, "play = $isPlay")
+            if(isPlay) {
                 switchPlay()
                 secondClickOnPlayAudioButton()
             }
@@ -50,12 +51,12 @@ class SetDialog(private val context: Context,
         setDialogBinding.audioNameText.text = file.name.getRecordName()
         Log.i(RecordFragment.TAG, file.name.getRecordName())
         setDialogBinding.playAudioBtn.setOnClickListener {
-            Log.d(TAG, "First click play = $play")
+            Log.d(TAG, "First click play = $isPlay")
 
             switchPlay()
-            Log.d(TAG, "After switch play = $play")
+            Log.d(TAG, "After switch play = $isPlay")
 
-            if(play) {
+            if(isPlay) {
                 firstClickOnPlayAudioButton()
                 playMediaPlayer()
             } else {
@@ -219,18 +220,19 @@ class SetDialog(private val context: Context,
             Log.i(RecordFragment.TAG, "CLose SetDialog")
             dialog.cancel()
             closeMediaPlayer()
-            play = false
+            isPlay = false
         }
     }
 
     private fun setSetButtonListener() {
         setDialogBinding.setBtn.setOnClickListener {
             Log.i(RecordFragment.TAG, "Slide to CalendarFragment")
-            viewPager.currentItem = 1
+            val adapter = viewPager.adapter as ViewPageAdapter
+            adapter.setAlarm(currentRecordPath)
             Log.i(RecordFragment.TAG, "CLose SetDialog")
             dialog.cancel()
             closeMediaPlayer()
-            play = false
+            isPlay = false
         }
     }
 
@@ -252,7 +254,7 @@ class SetDialog(private val context: Context,
     }
     @Synchronized
     private fun switchPlay() {
-        play = !play
+        isPlay = !isPlay
     }
 
     companion object {
