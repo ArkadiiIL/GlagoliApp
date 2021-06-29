@@ -17,7 +17,7 @@ import com.google.android.material.timepicker.TimeFormat
 import java.util.*
 
 class SimpleCalendarAdapter(private val context: Context,
-                            private val fragmentManager: FragmentManager):
+                            private val listener: (CalendarViewHolder) -> Unit):
         RecyclerView.Adapter<CalendarViewHolder>(),
         CalendarAdapter {
     private val days = mutableListOf<Day>()
@@ -33,32 +33,7 @@ class SimpleCalendarAdapter(private val context: Context,
         Log.v(TAG, "onBindViewHolder")
         holder.day = days[position]
         holder.cellDayText.text = holder.day?.day
-        holder.cellDayText.setOnClickListener {
-            val picker =
-                    MaterialTimePicker.Builder()
-                            .setTimeFormat(TimeFormat.CLOCK_24H)
-                            .setTitleText(R.string.select_time)
-                            .setInputMode(MaterialTimePicker.INPUT_MODE_KEYBOARD)
-                            .build()
-            picker.addOnPositiveButtonClickListener {
-                val alarmManager =
-                        context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                val intent = Intent(context, AlarmReceiver::class.java)
-                val pendingIntent =
-                        PendingIntent.getBroadcast(context, 0, intent, 0)
-                val calendar = Calendar.getInstance()
-                calendar.set(Calendar.HOUR_OF_DAY, picker.hour)
-                calendar.set(Calendar.MINUTE, picker.minute)
-                calendar.set(Calendar.SECOND, 0)
-                alarmManager.setExact(
-                        AlarmManager.RTC_WAKEUP,
-                        calendar.timeInMillis,
-                        pendingIntent
-                )
-            }
-            picker.show(fragmentManager, TAG)
-        }
-
+        listener(holder)
     }
 
     override fun getItemCount(): Int = days.size

@@ -6,50 +6,74 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/time_guideline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.1"
+        />
     <TextView
         android:id="@+id/text_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
         android:text="00:00"
         android:textSize="40sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/time_guideline" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/image_delete_guideline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.1"
+        />
 
     <ImageView
         android:id="@+id/delete_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="310dp"
-        android:layout_marginEnd="110dp"
-        app:layout_constraintEnd_toEndOf="@id/start_btn"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_time"
+        android:layout_marginTop="10dp"
+        app:layout_constraintStart_toEndOf="@id/image_delete_guideline"
+        app:layout_constraintTop_toBottomOf="@id/button_guideline"
         app:srcCompat="@drawable/ic_action_delete_audio"
         android:visibility="gone" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/image_save_guideline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.4"
+        />
 
     <ImageView
         android:id="@+id/save_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="150dp"
-        app:layout_constraintTop_toBottomOf="@id/text_time"
+        app:layout_constraintTop_toBottomOf="@id/image_save_guideline"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_lock_audio"
         android:visibility="gone"
+        />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/button_guideline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.7"
         />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/start_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="300dp"
         app:elevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_time"
+        app:layout_constraintTop_toBottomOf="@id/button_guideline"
         app:srcCompat="@drawable/ic_action_play" />
 </androidx.constraintlayout.widget.ConstraintLayout>

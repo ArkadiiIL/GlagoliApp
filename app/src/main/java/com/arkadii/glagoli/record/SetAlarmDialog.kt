@@ -12,24 +12,24 @@ import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.arkadii.glagoli.R
 import com.arkadii.glagoli.ViewPageAdapter
-import com.arkadii.glagoli.databinding.SetDialogBinding
+import com.arkadii.glagoli.calendar.CalendarDialog
+import com.arkadii.glagoli.databinding.SetAlarmDialogBinding
 import com.arkadii.glagoli.extensions.getRecordName
 import com.arkadii.glagoli.extensions.setRecordFormat
 import java.io.File
 
-class SetDialog(private val context: Context,
-                private val mediaRecorderManager: MediaRecorderManager,
-                private val viewPager: ViewPager2
-) {
+class SetAlarmDialog(private val context: Context,
+                     private val mediaRecorderManager: MediaRecorderManager) {
     private var currentRecordPath = ""
     private val mediaPlayerManager: MediaPlayerManager = MediaPlayerManager()
-    private lateinit var setDialogBinding: SetDialogBinding
+    private lateinit var setDialogBinding: SetAlarmDialogBinding
     private lateinit var dialog: AlertDialog
     private val path = "${context.externalCacheDir?.absolutePath}/"
+    var calendarDialog: CalendarDialog? = null
     @Volatile
     private var isPlay = false
 
-     fun showSetDialog() {
+     fun showSetAlertDialog() {
         val builder = AlertDialog.Builder(context)
         builder.setCancelable(false)
 
@@ -67,13 +67,13 @@ class SetDialog(private val context: Context,
         builder.setView(setDialogBinding.root)
         dialog = builder.create()
         dialog.window?.setBackgroundDrawable(ColorDrawable(0))
-        Log.i(RecordFragment.TAG, "Show SetDialog")
+        Log.i(RecordFragment.TAG, "Show SetAlertDialog")
         dialog.show()
     }
 
     private fun initSetDialogBinding() {
-        Log.i(RecordFragment.TAG, "Init SetDialogBinding")
-        setDialogBinding = SetDialogBinding.inflate(
+        Log.i(TAG, "Init SetAlarmDialogBinding")
+        setDialogBinding = SetAlarmDialogBinding.inflate(
                 LayoutInflater.from(context)
         )
     }
@@ -217,23 +217,25 @@ class SetDialog(private val context: Context,
     private fun setDeleteButtonListener() {
         setDialogBinding.deleteBtn.setOnClickListener {
             deleteCurrentRecord()
-            Log.i(RecordFragment.TAG, "CLose SetDialog")
-            dialog.cancel()
-            closeMediaPlayer()
-            isPlay = false
+            closeDialog()
         }
     }
 
     private fun setSetButtonListener() {
         setDialogBinding.setBtn.setOnClickListener {
-            Log.i(RecordFragment.TAG, "Slide to CalendarFragment")
-            val adapter = viewPager.adapter as ViewPageAdapter
-            adapter.setAlarm(currentRecordPath)
-            Log.i(RecordFragment.TAG, "CLose SetDialog")
-            dialog.cancel()
-            closeMediaPlayer()
-            isPlay = false
+            Log.i(RecordFragment.TAG, "Show CalendarDialog")
+            val calendar = calendarDialog
+            if(calendar != null) {
+                calendar.showCalendarDialog()
+            } else error("CalendarDialog cannot be null")
         }
+    }
+
+    fun closeDialog() {
+        Log.i(RecordFragment.TAG, "CLose SetAlertDialog")
+        dialog.cancel()
+        closeMediaPlayer()
+        isPlay = false
     }
 
      fun deleteCurrentRecord(): Boolean {
@@ -258,6 +260,6 @@ class SetDialog(private val context: Context,
     }
 
     companion object {
-        const val TAG = "SetDialogCHECKTAG"
+        const val TAG = "SetAlarmDialog"
     }
 }

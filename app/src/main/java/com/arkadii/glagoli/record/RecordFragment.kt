@@ -1,33 +1,23 @@
 package com.arkadii.glagoli.record
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.graphics.drawable.ColorDrawable
-import android.media.AudioAttributes
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.view.inputmethod.EditorInfo
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.arkadii.glagoli.MainActivity
 import com.arkadii.glagoli.R
+import com.arkadii.glagoli.calendar.CalendarDialog
 import com.arkadii.glagoli.databinding.FragmentRecordBinding
-import com.arkadii.glagoli.databinding.SetDialogBinding
-import com.arkadii.glagoli.extensions.getRecordName
-import com.arkadii.glagoli.extensions.setRecordFormat
 import com.arkadii.glagoli.extensions.toPx
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import java.io.File
-import java.lang.NullPointerException
 import kotlin.math.abs
 
 class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
     private var _binding: FragmentRecordBinding? = null
-    private val binding get() = _binding ?: error("NullPointerException in RecordFragment")
+    private val binding get() = _binding ?: error("NullPointerException in $TAG")
     private lateinit var mediaRecorderManager: MediaRecorderManager
     private lateinit var mediaPlayerManager: MediaPlayerManager
     private lateinit var timerManager: TimerManager
@@ -36,7 +26,8 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
     private var isButtonDown = false
     private var buttonStartX = 0f
     private var buttonStartY = 0f
-    private lateinit var setDialog: SetDialog
+    private lateinit var setAlarmDialog: SetAlarmDialog
+    private lateinit var calendarDialog: CalendarDialog
     private var currentRecordPath = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +39,7 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
-        Log.v(TAG, "init binding and setListeners in on CreateView")
+        Log.v(TAG, "Init binding and setListeners in CreateView")
        _binding = FragmentRecordBinding.inflate(inflater, container, false)
         Log.i(TAG, "Set RecordButtonListener")
         setRecordButtonListener()
@@ -64,8 +55,13 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
             mediaRecorderManager = MediaRecorderManager(fActivity.applicationContext)
             Log.i(TAG, "Init MediaPlayerManager")
             mediaPlayerManager = MediaPlayerManager()
+            Log.i(TAG, "Init CalendarDialog")
+            calendarDialog = CalendarDialog(requireContext(), requireFragmentManager())
             Log.i(TAG, "Init SetDialog")
-            setDialog = SetDialog(requireContext(), mediaRecorderManager, viewPager)
+            setAlarmDialog = SetAlarmDialog(requireContext(), mediaRecorderManager)
+
+            calendarDialog.setAlarmDialog = setAlarmDialog
+            setAlarmDialog.calendarDialog = calendarDialog
 
             if(fActivity is AppCompatActivity) {
                 Log.i(MainActivity.TAG, "Init TimeManager")
@@ -104,8 +100,6 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
             false
         }
     }
-
-
 
     private fun actionDown(view: View) {
         viewPager.isUserInputEnabled = false
@@ -148,9 +142,9 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
 
         buttonMove = ButtonMove.DEFAULT
         isButtonDown = false
-        setDialog.setCurrentRecordPath(mediaRecorderManager.currentRecordPath)
+        setAlarmDialog.setCurrentRecordPath(mediaRecorderManager.currentRecordPath)
         if(callSetDialog) {
-            setDialog.showSetDialog()
+            setAlarmDialog.showSetAlertDialog()
         }
     }
 
@@ -181,7 +175,7 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
                     event.rawX < abs(95.toPx()) -> {
                         isButtonDown = false
                         actionUp(parentY, false)
-                        setDialog.deleteCurrentRecord()
+                        setAlarmDialog.deleteCurrentRecord()
                         buttonMove = ButtonMove.DEFAULT
                     }
                 }
@@ -220,7 +214,7 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        Log.d(TAG, "on Destroy View")
+        Log.d(TAG, "onDestroyView in $TAG")
         _binding = null
     }
 
@@ -235,6 +229,6 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
 
 
     companion object {
-        const val TAG = "RecordFragmentCHECKTAG"
+        const val TAG = "RecordFragment"
     }
 }
