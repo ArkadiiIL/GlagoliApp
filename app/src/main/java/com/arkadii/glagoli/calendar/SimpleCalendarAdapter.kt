@@ -46,6 +46,6 @@ class SimpleCalendarAdapter(private val context: Context,
     }
 
     companion object {
-        const val TAG = "SimpleCalendarAdapterCHECKTAG"
+        const val TAG = "SimpleCalendarAdapter"
     }
 }

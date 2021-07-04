@@ -88,6 +88,6 @@ class PermissionHelper(private val context: AppCompatActivity,
     }
 
     companion object {
-        const val TAG = "PermissionHelperCHECKTAG"
+        const val TAG = "PermissionHelper"
     }
 }

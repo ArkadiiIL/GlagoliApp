@@ -10,9 +10,13 @@ import android.graphics.drawable.ColorDrawable
 import android.util.Log
 import android.view.LayoutInflater
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.arkadii.glagoli.AlarmReceiver
 import com.arkadii.glagoli.R
+import com.arkadii.glagoli.data.Alarm
+import com.arkadii.glagoli.data.AlarmDatabase
+import com.arkadii.glagoli.data.AlarmViewModel
 import com.arkadii.glagoli.databinding.CalendarDialogBinding
 import com.arkadii.glagoli.record.RecordFragment
 import com.arkadii.glagoli.record.SetAlarmDialog
@@ -92,27 +96,44 @@ class CalendarDialog(private val context: Context,
                             .build()
             picker.addOnPositiveButtonClickListener {
                 val alarmManager =
-                        context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                    context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
                 val intent = Intent(context, AlarmReceiver::class.java)
                 val pendingIntent =
-                        PendingIntent.getBroadcast(context, 0, intent, 0)
+                    PendingIntent.getBroadcast(context, 0, intent, 0)
                 val calendar = Calendar.getInstance()
-                calendar.set(Calendar.HOUR_OF_DAY, picker.hour)
-                calendar.set(Calendar.MINUTE, picker.minute)
-                calendar.set(Calendar.SECOND, 0)
-                alarmManager.setExact(
+                val year = holder.day?.year?.toInt()
+                val month = holder.day?.month?.toInt()
+                val day = holder.day?.month?.toInt()
+                if ((year != null) && (month != null) && (day != null)) {
+                    calendar.set(Calendar.YEAR, year)
+                    calendar.set(Calendar.MONTH, month)
+                    calendar.set(Calendar.DAY_OF_MONTH, day)
+                    calendar.set(Calendar.HOUR_OF_DAY, picker.hour)
+                    calendar.set(Calendar.MINUTE, picker.minute)
+                    calendar.set(Calendar.SECOND, 0)
+                    saveAlarm(calendar.timeInMillis, year, month, day, picker.hour, picker.minute)
+                    alarmManager.setExact(
                         AlarmManager.RTC_WAKEUP,
                         calendar.timeInMillis,
                         pendingIntent
-                )
-                val alarmDialog = setAlarmDialog
-                if(alarmDialog != null) {
-                    alarmDialog.closeDialog()
-                } else error("SetAlarmDialog cannot be null!")
+                    )
+                    val alarmDialog = setAlarmDialog
+                    if (alarmDialog != null) {
+                        alarmDialog.closeDialog()
+                    } else error("SetAlarmDialog cannot be null!")
+                } else error("Day must have fields filled in")
             }
-
             picker.show(fragmentManager, SimpleCalendarAdapter.TAG)
         }
+    }
+
+    private fun saveAlarm(alarmTime: Long,
+                          year: Int,
+                          month: Int,
+                          day: Int,
+                          hour: Int,
+                          minute: Int ) {
+        val alarmViewModel = ViewModelProvider(context.)
     }
 
     companion object {
