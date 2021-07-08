@@ -14,7 +14,7 @@ class AlarmViewModel(application: Application): AndroidViewModel(application) {
     init {
         val alarmDAO = AlarmDatabase.getDatabase(application).alarmDAO()
         repository = AlarmRepository(alarmDAO)
-        getAllAlarms = repository.getAllAlarms()
+        getAllAlarms = repository.getAllLiveData()
     }
 
     fun addAlarms(vararg alarms: Alarm) {

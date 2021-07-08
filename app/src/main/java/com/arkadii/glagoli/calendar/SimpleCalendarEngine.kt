@@ -25,9 +25,9 @@ class SimpleCalendarEngine: CalendarEngine {
             if(x > firstOfMonth) {
                 days.add(Day(
                         true,
-                        (x - firstOfMonth).toString(),
-                        calendar.get(Calendar.MONTH).toString(),
-                        calendar.get(Calendar.YEAR).toString()
+                    (x - firstOfMonth).toString(),
+                    (calendar.get(Calendar.MONTH) + 1).toString(),
+                    calendar.get(Calendar.YEAR).toString()
                 ))
             } else {
                 days.add(Day(false, "", "", ""))

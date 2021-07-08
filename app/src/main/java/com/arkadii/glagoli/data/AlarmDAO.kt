@@ -6,7 +6,10 @@ import androidx.room.*
 @Dao
 interface AlarmDAO {
     @Query("SELECT * FROM alarm_table")
-    fun getAll(): LiveData<List<Alarm>>
+    fun getAllLiveData(): LiveData<List<Alarm>>
+
+    @Query("SELECT * FROM alarm_table")
+    fun getAllAlarms(): List<Alarm>
 
     @Insert
     fun insert(alarms: Array<out Alarm>)

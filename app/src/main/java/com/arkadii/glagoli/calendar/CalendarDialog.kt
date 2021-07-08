@@ -10,28 +10,27 @@ import android.graphics.drawable.ColorDrawable
 import android.util.Log
 import android.view.LayoutInflater
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.arkadii.glagoli.AlarmReceiver
-import com.arkadii.glagoli.R
 import com.arkadii.glagoli.data.Alarm
-import com.arkadii.glagoli.data.AlarmDatabase
 import com.arkadii.glagoli.data.AlarmViewModel
 import com.arkadii.glagoli.databinding.CalendarDialogBinding
 import com.arkadii.glagoli.record.RecordFragment
 import com.arkadii.glagoli.record.SetAlarmDialog
+import com.arkadii.glagoli.util.getAlarmManager
+import com.arkadii.glagoli.util.getTimePicker
 import com.google.android.material.timepicker.MaterialTimePicker
-import com.google.android.material.timepicker.TimeFormat
 import java.util.*
 
 class CalendarDialog(private val context: Context,
-                     private val fragmentManager: FragmentManager) {
+                     private val fragmentManager: FragmentManager,
+                     private val alarmViewModel: AlarmViewModel) {
     private lateinit var calendarDialogBinding: CalendarDialogBinding
     private val metrics = Resources.getSystem().displayMetrics
     private lateinit var calendarController: CalendarController
     private lateinit var dialog: AlertDialog
     var setAlarmDialog: SetAlarmDialog? = null
-    private var currentRecordPath = ""
+    var currentRecordPath = ""
 
     fun showCalendarDialog() {
         val builder = AlertDialog.Builder(context)
@@ -88,52 +87,64 @@ class CalendarDialog(private val context: Context,
 
     private val listener: (CalendarViewHolder) -> Unit = { holder ->
         holder.cellDayText.setOnClickListener {
-            val picker =
-                    MaterialTimePicker.Builder()
-                            .setTimeFormat(TimeFormat.CLOCK_24H)
-                            .setTitleText(R.string.select_time)
-                            .setInputMode(MaterialTimePicker.INPUT_MODE_KEYBOARD)
-                            .build()
+            val picker = getTimePicker()
             picker.addOnPositiveButtonClickListener {
-                val alarmManager =
-                    context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                val intent = Intent(context, AlarmReceiver::class.java)
-                val pendingIntent =
-                    PendingIntent.getBroadcast(context, 0, intent, 0)
-                val calendar = Calendar.getInstance()
-                val year = holder.day?.year?.toInt()
-                val month = holder.day?.month?.toInt()
-                val day = holder.day?.month?.toInt()
-                if ((year != null) && (month != null) && (day != null)) {
-                    calendar.set(Calendar.YEAR, year)
-                    calendar.set(Calendar.MONTH, month)
-                    calendar.set(Calendar.DAY_OF_MONTH, day)
-                    calendar.set(Calendar.HOUR_OF_DAY, picker.hour)
-                    calendar.set(Calendar.MINUTE, picker.minute)
-                    calendar.set(Calendar.SECOND, 0)
-                    saveAlarm(calendar.timeInMillis, year, month, day, picker.hour, picker.minute)
-                    alarmManager.setExact(
-                        AlarmManager.RTC_WAKEUP,
-                        calendar.timeInMillis,
-                        pendingIntent
-                    )
-                    val alarmDialog = setAlarmDialog
-                    if (alarmDialog != null) {
-                        alarmDialog.closeDialog()
-                    } else error("SetAlarmDialog cannot be null!")
-                } else error("Day must have fields filled in")
+               pickerListener(holder, picker)
             }
             picker.show(fragmentManager, SimpleCalendarAdapter.TAG)
         }
     }
 
-    private fun saveAlarm(alarmTime: Long,
-                          year: Int,
-                          month: Int,
-                          day: Int,
-                          hour: Int,
-                          minute: Int ) {
-        val alarmViewModel = ViewModelProvider(context.)
+    private fun pickerListener(holder: CalendarViewHolder, picker: MaterialTimePicker) {
+        val calendar = Calendar.getInstance()
+        val year = holder.day?.year?.toInt()
+        val month = holder.day?.month?.toInt()
+        val day = holder.day?.day?.toInt()
+
+        if ((year != null) && (month != null) && (day != null)) {
+            calendar.set(Calendar.YEAR, year)
+            calendar.set(Calendar.MONTH, month - 1)
+            calendar.set(Calendar.DAY_OF_MONTH, day)
+            calendar.set(Calendar.HOUR_OF_DAY, picker.hour)
+            calendar.set(Calendar.MINUTE, picker.minute)
+            calendar.set(Calendar.SECOND, 0)
+            val alarm
+            = createAlarm(calendar.timeInMillis, year, month, day, picker.hour, picker.minute)
+
+            setAlarm(alarm)
+            saveAlarm(alarm)
+            cancelDialog()
+            val alarmDialog = setAlarmDialog
+            if (alarmDialog != null) {
+                alarmDialog.closeDialog()
+            } else error("SetAlarmDialog cannot be null!")
+        } else error("Day must have fields filled in")
+    }
+
+    private fun createAlarm(timeInMillis: Long,
+                            year: Int,
+                            month: Int,
+                            day: Int,
+                            hour: Int,
+                            minute: Int)
+    = Alarm(0, timeInMillis, year, month, day, hour, minute, currentRecordPath)
+
+    private fun saveAlarm(alarm: Alarm) {
+        Log.i(TAG, "Save new Alarm $alarm")
+        alarmViewModel.addAlarms(alarm)
+    }
+
+    private fun setAlarm(alarm: Alarm) {
+        Log.i(TAG, "Set new Alarm")
+        val alarmManager = getAlarmManager(context)
+        val intent = Intent(context, AlarmReceiver::class.java)
+        val pendingIntent =
+            PendingIntent.getBroadcast(context, 0, intent, 0)
+        alarmManager.setExact(
+            AlarmManager.RTC_WAKEUP,
+            alarm.alarmTime,
+            pendingIntent
+        )
     }
 
     companion object {

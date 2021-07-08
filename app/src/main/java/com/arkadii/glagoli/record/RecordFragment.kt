@@ -6,10 +6,12 @@ import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.arkadii.glagoli.MainActivity
 import com.arkadii.glagoli.R
 import com.arkadii.glagoli.calendar.CalendarDialog
+import com.arkadii.glagoli.data.AlarmViewModel
 import com.arkadii.glagoli.databinding.FragmentRecordBinding
 import com.arkadii.glagoli.extensions.toPx
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -56,9 +58,12 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
             Log.i(TAG, "Init MediaPlayerManager")
             mediaPlayerManager = MediaPlayerManager()
             Log.i(TAG, "Init CalendarDialog")
-            calendarDialog = CalendarDialog(requireContext(), requireFragmentManager())
+            val alarmViewModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
+            calendarDialog = CalendarDialog(requireContext(),
+                requireFragmentManager(),
+                alarmViewModel)
             Log.i(TAG, "Init SetDialog")
-            setAlarmDialog = SetAlarmDialog(requireContext(), mediaRecorderManager)
+            setAlarmDialog = SetAlarmDialog(requireContext())
 
             calendarDialog.setAlarmDialog = setAlarmDialog
             setAlarmDialog.calendarDialog = calendarDialog

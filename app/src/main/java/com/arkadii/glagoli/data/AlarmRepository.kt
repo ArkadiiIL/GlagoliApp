@@ -2,7 +2,9 @@ package com.arkadii.glagoli.data
 
 class AlarmRepository(private val alarmDAO: AlarmDAO) {
 
-    fun getAllAlarms() = alarmDAO.getAll()
+    fun getAllAlarms() = alarmDAO.getAllAlarms()
+
+    fun getAllLiveData() = alarmDAO.getAllLiveData()
 
     suspend fun addAlarms(alarms: Array<out Alarm>) = alarmDAO.insert(alarms)
 

@@ -18,8 +18,7 @@ import com.arkadii.glagoli.extensions.getRecordName
 import com.arkadii.glagoli.extensions.setRecordFormat
 import java.io.File
 
-class SetAlarmDialog(private val context: Context,
-                     private val mediaRecorderManager: MediaRecorderManager) {
+class SetAlarmDialog(private val context: Context) {
     private var currentRecordPath = ""
     private val mediaPlayerManager: MediaPlayerManager = MediaPlayerManager()
     private lateinit var setDialogBinding: SetAlarmDialogBinding
@@ -226,6 +225,7 @@ class SetAlarmDialog(private val context: Context,
             Log.i(RecordFragment.TAG, "Show CalendarDialog")
             val calendar = calendarDialog
             if(calendar != null) {
+                calendar.currentRecordPath = currentRecordPath
                 calendar.showCalendarDialog()
             } else error("CalendarDialog cannot be null")
         }
