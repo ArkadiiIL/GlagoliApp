@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.util.Log
 import com.arkadii.glagoli.data.AlarmDatabase
 import com.arkadii.glagoli.data.AlarmRepository
@@ -31,11 +32,13 @@ class AutoStartUpReceiver: BroadcastReceiver() {
         CoroutineScope(Dispatchers.IO).launch {
             alarmRepository.getAllAlarms().forEach {
                 Log.i(TAG, "Set $it")
-                val alarmManager =
-                    context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
                 val intent = Intent(context, AlarmReceiver::class.java)
+                intent.putExtra("path", it.recordPath)
                 val pendingIntent =
-                    PendingIntent.getBroadcast(context, 0, intent, 0)
+                    PendingIntent.getBroadcast(context,
+                        it.pendingIntentId,
+                        intent,
+                        PendingIntent.FLAG_ONE_SHOT)
                 alarmManager.setExact(
                     AlarmManager.RTC_WAKEUP,
                     it.alarmTime,

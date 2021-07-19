@@ -11,6 +11,9 @@ interface AlarmDAO {
     @Query("SELECT * FROM alarm_table")
     fun getAllAlarms(): List<Alarm>
 
+    @Query("SELECT * FROM alarm_table WHERE recordPath == :path")
+    fun getAlarmByPath(path: String): LiveData<Alarm>
+
     @Insert
     fun insert(alarms: Array<out Alarm>)
 
@@ -19,4 +22,5 @@ interface AlarmDAO {
 
     @Delete
     fun delete(alarm: Alarm)
+
 }

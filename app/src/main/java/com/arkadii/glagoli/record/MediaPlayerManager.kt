@@ -28,6 +28,11 @@ class MediaPlayerManager {
         }
     }
 
+    fun isLooping(isLooping: Boolean) {
+        mediaPlayer?.isLooping = isLooping
+    }
+
+
     fun stop() {
         Log.i(TAG, "Stop MediaPlayer")
         mediaPlayer?.stop()
@@ -47,6 +52,6 @@ class MediaPlayerManager {
     }
 
     companion object {
-        const val TAG = "MediaPlayerManagerCHECKTAG"
+        const val TAG = "MediaPlayerManager"
     }
 }

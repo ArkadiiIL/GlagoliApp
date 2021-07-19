@@ -12,5 +12,5 @@ data class Alarm(
     var day: Int,
     var hour: Int,
     var minute: Int,
-    var recordPath: String
-)
+    var recordPath: String,
+    var pendingIntentId: Int = 0)

@@ -87,7 +87,7 @@ class CalendarDialog(private val context: Context,
 
     private val listener: (CalendarViewHolder) -> Unit = { holder ->
         holder.cellDayText.setOnClickListener {
-            val picker = getTimePicker()
+            val picker = getTimePicker(context)
             picker.addOnPositiveButtonClickListener {
                pickerListener(holder, picker)
             }
@@ -135,11 +135,17 @@ class CalendarDialog(private val context: Context,
     }
 
     private fun setAlarm(alarm: Alarm) {
-        Log.i(TAG, "Set new Alarm")
+        Log.i(TAG, "Set new $alarm")
         val alarmManager = getAlarmManager(context)
         val intent = Intent(context, AlarmReceiver::class.java)
+        intent.putExtra("path", alarm.recordPath)
+        val id = System.currentTimeMillis().toInt()
+        alarm.pendingIntentId = id
         val pendingIntent =
-            PendingIntent.getBroadcast(context, 0, intent, 0)
+            PendingIntent.getBroadcast(context,
+                id,
+                intent,
+                PendingIntent.FLAG_ONE_SHOT)
         alarmManager.setExact(
             AlarmManager.RTC_WAKEUP,
             alarm.alarmTime,

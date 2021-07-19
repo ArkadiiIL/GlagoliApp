@@ -23,6 +23,9 @@ class AlarmViewModel(application: Application): AndroidViewModel(application) {
         }
     }
 
+    fun getAlarmByPath(path: String): LiveData<Alarm> = repository.getAlarmByPath(path)
+
+
     fun updateAlarm(alarm: Alarm) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.updateAlarm(alarm)
