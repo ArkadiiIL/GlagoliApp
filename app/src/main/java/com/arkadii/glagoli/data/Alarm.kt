@@ -10,6 +10,7 @@ data class Alarm(
     var year: Int,
     var month: Int,
     var day: Int,
+    var dayOfWeek: Int,
     var hour: Int,
     var minute: Int,
     var recordPath: String,

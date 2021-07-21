@@ -9,9 +9,7 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.viewpager2.widget.ViewPager2
 import com.arkadii.glagoli.R
-import com.arkadii.glagoli.ViewPageAdapter
 import com.arkadii.glagoli.calendar.CalendarDialog
 import com.arkadii.glagoli.databinding.SetAlarmDialogBinding
 import com.arkadii.glagoli.extensions.getRecordName
@@ -28,7 +26,7 @@ class SetAlarmDialog(private val context: Context) {
     @Volatile
     private var isPlay = false
 
-     fun showSetAlertDialog() {
+    fun showSetAlertDialog() {
         val builder = AlertDialog.Builder(context)
         builder.setCancelable(false)
 
@@ -48,6 +46,7 @@ class SetAlarmDialog(private val context: Context) {
         }
 
         setDialogBinding.audioNameText.text = file.name.getRecordName()
+        setDialogBinding.audioNameText.isSelected = true
         Log.i(RecordFragment.TAG, file.name.getRecordName())
         setDialogBinding.playAudioBtn.setOnClickListener {
             Log.d(TAG, "First click play = $isPlay")

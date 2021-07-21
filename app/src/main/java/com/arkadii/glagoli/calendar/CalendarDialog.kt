@@ -57,7 +57,7 @@ class CalendarDialog(private val context: Context,
     private fun initCalendarController() {
         Log.i(TAG, "Init CalendarController")
         val calendarRealization = SimpleCalendarEngine()
-        val adapter = SimpleCalendarAdapter(context, listener)
+        val adapter = SimpleCalendarAdapter(listener)
 
         calendarDialogBinding.rvDays.adapter = adapter
         calendarDialogBinding.rvDays.layoutManager = GridLayoutManager(context, 7 )
@@ -108,8 +108,16 @@ class CalendarDialog(private val context: Context,
             calendar.set(Calendar.HOUR_OF_DAY, picker.hour)
             calendar.set(Calendar.MINUTE, picker.minute)
             calendar.set(Calendar.SECOND, 0)
+            val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
             val alarm
-            = createAlarm(calendar.timeInMillis, year, month, day, picker.hour, picker.minute)
+            = createAlarm(
+                calendar.timeInMillis,
+                year,
+                month,
+                day,
+                dayOfWeek,
+                picker.hour,
+                picker.minute)
 
             setAlarm(alarm)
             saveAlarm(alarm)
@@ -125,9 +133,10 @@ class CalendarDialog(private val context: Context,
                             year: Int,
                             month: Int,
                             day: Int,
+                            dayOfWeek: Int,
                             hour: Int,
                             minute: Int)
-    = Alarm(0, timeInMillis, year, month, day, hour, minute, currentRecordPath)
+    = Alarm(0, timeInMillis, year, month, day, dayOfWeek, hour, minute, currentRecordPath)
 
     private fun saveAlarm(alarm: Alarm) {
         Log.i(TAG, "Save new Alarm $alarm")
