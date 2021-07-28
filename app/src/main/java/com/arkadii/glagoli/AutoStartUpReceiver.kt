@@ -30,7 +30,7 @@ class AutoStartUpReceiver: BroadcastReceiver() {
     private fun setAlarms(context: Context) {
         Log.i(TAG, "Set Alarms")
         CoroutineScope(Dispatchers.IO).launch {
-            alarmRepository.getAllAlarms().forEach {
+            alarmRepository.getAllAlarms().filter { alarm -> alarm.isEnabled }.forEach {
                 Log.i(TAG, "Set $it")
                 val intent = Intent(context, AlarmReceiver::class.java)
                 intent.putExtra("path", it.recordPath)

@@ -8,10 +8,14 @@
         you can continue</string>
     <string name="permission_not_granted">Sorry, but application can\'t work
         without record audio permission. Please will grant record audio or close app</string>
+    <string name="wrong_time">Wrong time entered!</string>
     <string name="to_settings">Open permission settings</string>
     <string name="close_app">Close app</string>
     <string name="set_audio">SET</string>
     <string name="rename_audio">RENAME</string>
     <string name="delete_audio">DELETE</string>
     <string name="select_time">Select Time</string>
+    <string name="delete_alert">Are you sure you want to delete the alert?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

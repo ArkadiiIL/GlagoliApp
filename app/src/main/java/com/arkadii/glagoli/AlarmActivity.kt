@@ -12,8 +12,9 @@ import com.arkadii.glagoli.record.MediaPlayerManager
 
 class AlarmActivity: AppCompatActivity() {
     private lateinit var binding: ActivityAlarmBinding
-    private lateinit var mediaPlayerManager: MediaPlayerManager
     private lateinit var alarmViewModel: AlarmViewModel
+    private var mediaPlayerManager: MediaPlayerManager? = null
+    private var alarm: Alarm? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,11 +28,12 @@ class AlarmActivity: AppCompatActivity() {
 
         if(path != null) {
             alarmViewModel.getAlarmByPath(path).observe(this) { alarm ->
-
                 if(alarm != null) {
+                    this.alarm = alarm
+
                     Log.i(TAG, "Init MediaPlayerManager")
                     mediaPlayerManager = MediaPlayerManager()
-                    mediaPlayerManager.initMediaPlayer(
+                    mediaPlayerManager?.initMediaPlayer(
                         AudioAttributes.Builder()
                             .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                             .setUsage(AudioAttributes.USAGE_MEDIA)
@@ -40,13 +42,16 @@ class AlarmActivity: AppCompatActivity() {
                     )
                     setStopListener()
                     Log.i(TAG, "Play record from $alarm")
-                    mediaPlayerManager.isLooping(true)
-                    mediaPlayerManager.play()
+                    mediaPlayerManager?.isLooping(true)
+                    mediaPlayerManager?.play()
                 } else error("Alarm is null")
-
             }
         }
         }
+    private fun disableAlarm(alarm: Alarm) {
+        alarm.isEnabled = false
+        alarmViewModel.updateAlarm(alarm)
+    }
 
     private fun setStopListener() {
         binding.stopAlarm.setOnClickListener {
@@ -57,9 +62,13 @@ class AlarmActivity: AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         Log.i(TAG, "Close AlarmActivity")
-            mediaPlayerManager.stop()
-            mediaPlayerManager.closeMediaPlayer()
+        mediaPlayerManager?.stop()
+        mediaPlayerManager?.closeMediaPlayer()
 
+        val alarm = this.alarm
+        if(alarm != null) {
+            disableAlarm(alarm)
+        }
     }
 
     companion object {

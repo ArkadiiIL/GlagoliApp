@@ -3,14 +3,17 @@ package com.arkadii.glagoli.record
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.arkadii.glagoli.MainActivity
 import com.arkadii.glagoli.R
-import com.arkadii.glagoli.calendar.CalendarDialog
+import com.arkadii.glagoli.calendar.SetCalendarDialog
 import com.arkadii.glagoli.data.AlarmViewModel
 import com.arkadii.glagoli.databinding.FragmentRecordBinding
 import com.arkadii.glagoli.extensions.toPx
@@ -29,8 +32,7 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
     private var buttonStartX = 0f
     private var buttonStartY = 0f
     private lateinit var setAlarmDialog: SetAlarmDialog
-    private lateinit var calendarDialog: CalendarDialog
-    private var currentRecordPath = ""
+    private lateinit var calendarDialog: SetCalendarDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,8 +61,8 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
             mediaPlayerManager = MediaPlayerManager()
             Log.i(TAG, "Init CalendarDialog")
             val alarmViewModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
-            calendarDialog = CalendarDialog(requireContext(),
-                requireFragmentManager(),
+            calendarDialog = SetCalendarDialog(requireContext(),
+                childFragmentManager,
                 alarmViewModel)
             Log.i(TAG, "Init SetDialog")
             setAlarmDialog = SetAlarmDialog(requireContext())
@@ -99,7 +101,7 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
                 } else if (event.action == MotionEvent.ACTION_MOVE && isButtonDown) {
 
                     Log.i(TAG, "ACTION_MOVE with ButtonStart")
-                    actionMove(view, event, parentLocation[0], parentLocation[1])
+                    actionMove(event, parentLocation[0], parentLocation[1])
                 }
             }
             false
@@ -153,8 +155,7 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
         }
     }
 
-    private fun actionMove(view: View,
-                           event: MotionEvent,
+    private fun actionMove(event: MotionEvent,
                            parentX: Int,
                            parentY: Int) {
         when(buttonMove) {

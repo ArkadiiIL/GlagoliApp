@@ -1,5 +1,6 @@
 package com.arkadii.glagoli.calendar
 
+import android.util.Log
 import java.util.*
 
 
@@ -13,15 +14,18 @@ class SimpleCalendarEngine: CalendarEngine {
         calendar.time = currentCalendar.time
         val daysOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
         calendar.set(Calendar.DAY_OF_MONTH, 1)
-        val firstOfMonth = calendar.get(Calendar.DAY_OF_WEEK) - (3 - calendar.firstDayOfWeek)
+        val firstOfMonth =
+            if(calendar.get(Calendar.DAY_OF_WEEK) == 1) 6
+            else calendar.get(Calendar.DAY_OF_WEEK) - 2
         val allDays = daysOfMonth + firstOfMonth
+        Log.d(TAG, "daysOfMonth = $daysOfMonth firstOfMonth = $firstOfMonth allDays = $allDays")
 
         return fillDays(calendar, firstOfMonth, allDays)
     }
 
     private fun fillDays(calendar: Calendar, firstOfMonth: Int, allDays: Int): MutableList<Day> {
         val days = mutableListOf<Day>()
-        for (x in 0..allDays) {
+        for (x in 1..allDays) {
             if(x > firstOfMonth) {
                 days.add(Day(
                         true,
@@ -66,6 +70,6 @@ class SimpleCalendarEngine: CalendarEngine {
     }
 
     companion object {
-        const val TAG = "SimpleCalendarRealizationCHECKTAG"
+        const val TAG = "SimpleCalendarEngine"
     }
 }

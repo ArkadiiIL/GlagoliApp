@@ -14,4 +14,5 @@ data class Alarm(
     var hour: Int,
     var minute: Int,
     var recordPath: String,
-    var pendingIntentId: Int = 0)
+    var pendingIntentId: Int = 0,
+    var isEnabled: Boolean = true)

@@ -9,6 +9,7 @@ import com.arkadii.glagoli.R
 
 class AlarmMenuViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
     val tvDay: TextView = itemView.findViewById(R.id.tv_day)
+    val tvTime: TextView = itemView.findViewById(R.id.tv_time)
     val playAudioAlarmMenuBtn: ImageButton =
         itemView.findViewById(R.id.play_audio_alarm_menu_btn)
     val tvFullDate: TextView = itemView.findViewById(R.id.tv_full_date)

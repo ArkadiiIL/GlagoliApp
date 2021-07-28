@@ -10,7 +10,7 @@ import android.view.inputmethod.EditorInfo
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.arkadii.glagoli.R
-import com.arkadii.glagoli.calendar.CalendarDialog
+import com.arkadii.glagoli.calendar.SetCalendarDialog
 import com.arkadii.glagoli.databinding.SetAlarmDialogBinding
 import com.arkadii.glagoli.extensions.getRecordName
 import com.arkadii.glagoli.extensions.setRecordFormat
@@ -22,7 +22,7 @@ class SetAlarmDialog(private val context: Context) {
     private lateinit var setDialogBinding: SetAlarmDialogBinding
     private lateinit var dialog: AlertDialog
     private val path = "${context.externalCacheDir?.absolutePath}/"
-    var calendarDialog: CalendarDialog? = null
+    var calendarDialog: SetCalendarDialog? = null
     @Volatile
     private var isPlay = false
 

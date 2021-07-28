@@ -1,12 +1,16 @@
 package com.arkadii.glagoli.calendar
 
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.arkadii.glagoli.R
+import java.util.*
 
-class SimpleCalendarAdapter(private val listener: (CalendarViewHolder) -> Unit):
+class SimpleCalendarAdapter(private val context: Context,
+                            private val listener: (CalendarViewHolder) -> Unit):
         RecyclerView.Adapter<CalendarViewHolder>(),
         CalendarAdapter {
     private val days = mutableListOf<Day>()
@@ -20,9 +24,28 @@ class SimpleCalendarAdapter(private val listener: (CalendarViewHolder) -> Unit):
 
     override fun onBindViewHolder(holder: CalendarViewHolder, position: Int) {
         Log.v(TAG, "onBindViewHolder")
-        holder.day = days[position]
-        holder.cellDayText.text = holder.day?.day
-        listener(holder)
+        val day = days[position]
+        holder.day = day
+        holder.cellDayText.text = day.day
+        if(day.isReal) {
+            if(isDayPassed(day)) {
+                holder.cellDayText.setTextColor(ContextCompat.getColor(context, R.color.grey))
+                holder.cellDayText.isClickable = false
+            } else {
+                listener(holder)
+            }
+        }
+    }
+
+    private fun isDayPassed(day: Day): Boolean {
+        val calendar = Calendar.getInstance()
+        val time = calendar.timeInMillis
+        Log.d(TAG,"day = ${day.day} month = ${day.month.toInt() - 1} year = ${day.year}")
+        calendar.set(Calendar.YEAR, day.year.toInt())
+        calendar.set(Calendar.MONTH, day.month.toInt() - 1)
+        calendar.set(Calendar.DAY_OF_MONTH, day.day.toInt())
+        Log.d(TAG, "isDayPassed = ${time > calendar.timeInMillis}")
+        return time > calendar.timeInMillis
     }
 
     override fun getItemCount(): Int = days.size

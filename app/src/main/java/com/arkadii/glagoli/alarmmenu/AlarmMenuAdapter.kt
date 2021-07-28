@@ -1,17 +1,34 @@
 package com.arkadii.glagoli.alarmmenu
 
+import android.app.AlertDialog
 import android.content.Context
+import android.media.AudioAttributes
+import android.text.format.DateFormat
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.arkadii.glagoli.R
+import com.arkadii.glagoli.calendar.EditCalendarDialog
 import com.arkadii.glagoli.data.Alarm
+import com.arkadii.glagoli.data.AlarmViewModel
+import com.arkadii.glagoli.record.MediaPlayerManager
+import com.arkadii.glagoli.util.cancelAlarm
+import com.arkadii.glagoli.util.setAlarm
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
-class AlarmMenuAdapter(val context: Context): RecyclerView.Adapter<AlarmMenuViewHolder>() {
+class AlarmMenuAdapter(private val context: Context,
+                       private val alarmViewModel: AlarmViewModel,
+                       private val fragmentManager: FragmentManager,
+                       private val mediaPlayerManager: MediaPlayerManager
+                       ): RecyclerView.Adapter<AlarmMenuViewHolder>() {
 
     private var data = emptyList<Alarm>()
+    private var playMap = ConcurrentHashMap<String, AlarmMenuViewHolder>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlarmMenuViewHolder {
         Log.v(TAG, "OnCreateViewHolder")
@@ -29,10 +46,14 @@ class AlarmMenuAdapter(val context: Context): RecyclerView.Adapter<AlarmMenuView
     }
 
     private fun setAlarmData(alarm: Alarm, holder: AlarmMenuViewHolder) {
+        Log.d(TAG, "Set alarm data for $alarm")
         holder.tvDay.text = getDayOfWeek(alarm.dayOfWeek)
-        holder.tvFullDate.text = "${alarm.day}.${alarm.month}.${alarm.year}"
-
-
+        val calendar = getCalendar(alarm)
+        holder.tvTime.text = getTime(calendar)
+        holder.tvFullDate.text = getFullDate(calendar)
+        holder.tvRecordName.text = File(alarm.recordPath).name
+        holder.tvRecordName.isSelected = true
+        holder.swEnable.isChecked = alarm.isEnabled
     }
 
     private fun getDayOfWeek(dayOfWeek: Int): String {
@@ -48,8 +69,111 @@ class AlarmMenuAdapter(val context: Context): RecyclerView.Adapter<AlarmMenuView
         }
     }
 
-    private fun setAlarmListeners(alarm: Alarm, holder: AlarmMenuViewHolder) {
+    private fun getCalendar(alarm: Alarm): Calendar {
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = alarm.alarmTime
+        return calendar
+    }
 
+    private fun getTime(calendar: Calendar): String {
+        val format = if (DateFormat.is24HourFormat(context))
+            SimpleDateFormat("hh:mm", Locale.getDefault())
+        else SimpleDateFormat("hh:mm a", Locale.getDefault())
+        return format.format(calendar.time)
+    }
+
+    private fun getFullDate(calendar: Calendar) :String {
+        val format = SimpleDateFormat("dd:MM:yyyy", Locale.getDefault())
+        return format.format(calendar.time)
+    }
+
+    private fun setAlarmListeners(alarm: Alarm, holder: AlarmMenuViewHolder) {
+        setDeleteListener(alarm, holder)
+        setSwitchListener(alarm, holder)
+        setEditListener(alarm, holder)
+        setPlayAudioListener(alarm, holder)
+    }
+
+    private fun setPlayAudioListener(alarm: Alarm, holder: AlarmMenuViewHolder) {
+        holder.playAudioAlarmMenuBtn.setOnClickListener {
+            if(!playMap.containsKey(alarm.recordPath)) playMusic(alarm, holder)
+            else stopMusic(alarm, holder)
+        }
+    }
+
+    private fun stopMusic(alarm: Alarm, holder: AlarmMenuViewHolder) {
+        mediaPlayerManager.stop()
+        playMap.remove(alarm.recordPath)
+        holder.playAudioAlarmMenuBtn.setImageResource(R.drawable.ic_button_play_alarm_menu)
+    }
+
+    private fun playMusic(alarm: Alarm, holder: AlarmMenuViewHolder) {
+        playMap.forEach {
+            it.value.playAudioAlarmMenuBtn.setImageResource(R.drawable.ic_button_play_alarm_menu)
+        }
+        playMap.clear()
+        playMap[alarm.recordPath] = holder
+        mediaPlayerManager.initMediaPlayer(AudioAttributes.Builder()
+            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+            .setUsage(AudioAttributes.USAGE_MEDIA)
+            .build(), alarm.recordPath)
+        holder.playAudioAlarmMenuBtn.setImageResource(R.drawable.ic_button_stop_alarm_menu)
+        mediaPlayerManager.setCompletionListener { stopMusic(alarm,holder) }
+        mediaPlayerManager.play()
+    }
+
+    private fun setEditListener(alarm: Alarm, holder: AlarmMenuViewHolder) {
+        holder.btnEdit.setOnClickListener {
+            editAlarm(alarm)
+        }
+    }
+
+    private fun editAlarm(alarm: Alarm) {
+        val editCalendarDialog = EditCalendarDialog(context, fragmentManager, alarm, alarmViewModel)
+        editCalendarDialog.showCalendarDialog()
+    }
+
+    private fun setSwitchListener(alarm: Alarm, holder: AlarmMenuViewHolder) {
+        holder.swEnable.setOnCheckedChangeListener { buttonView, isChecked ->
+            if(isChecked) {
+                if(System.currentTimeMillis() < alarm.alarmTime) {
+                alarm.isEnabled = true
+                setAlarm(alarm, context)
+                alarmViewModel.updateAlarm(alarm) } else {
+                    buttonView.isChecked = false
+                    editAlarm(alarm)
+                }
+            } else {
+                alarm.isEnabled = false
+                alarm.pendingIntentId = 0
+                cancelAlarm(alarm, context)
+                alarmViewModel.updateAlarm(alarm)
+            }
+        }
+    }
+
+    private fun setDeleteListener(alarm: Alarm, holder: AlarmMenuViewHolder) {
+        holder.btnDelete.setOnClickListener {
+            val builder = AlertDialog.Builder(context)
+            builder.setMessage(R.string.delete_alert)
+                .setPositiveButton(R.string.yes) { dialog, _ ->
+                    if(alarm.isEnabled) {
+                        cancelAlarm(alarm, context)
+                    }
+                    deleteRecord(alarm)
+                    alarmViewModel.deleteAlarm(alarm)
+                    dialog.cancel()
+                }
+                .setNegativeButton(R.string.no) { dialog, _ ->
+                    dialog.cancel()
+                }
+                .show()
+        }
+    }
+
+    private fun deleteRecord(alarm: Alarm) {
+        val file = File(alarm.recordPath)
+        file.delete()
     }
 
 
@@ -59,6 +183,7 @@ class AlarmMenuAdapter(val context: Context): RecyclerView.Adapter<AlarmMenuView
 
     fun setData(data: List<Alarm>) {
         this.data = data
+        notifyDataSetChanged()
     }
 
     companion object {
