@@ -88,22 +88,32 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
         binding.startBtn.actionDownListener = { button, _ ->
             Log.i(TAG, "ActionDownListener")
             if(holdButton) {
-                stopButton(button)
-                setAlarmDialog.setCurrentRecordPath(mediaRecorderManager.currentRecordPath)
-                setAlarmDialog.showSetAlertDialog()
+                unlockHoldButton(button)
             } else {
-                viewPager.isUserInputEnabled = false
-
-                mediaRecorderManager.startRecording()
-                timerManager.start(binding.textTime)
-                button.setImageResource(R.drawable.ic_action_stop)
-
-                button.customSize = 65.toPx()
-
-                binding.deleteIcon.visibility = View.VISIBLE
-                binding.saveIcon.visibility = View.VISIBLE
+                startRecord(button)
             }
         }
+    }
+
+    private fun startRecord(button: MoveFloatingActionButton) {
+        Log.i(TAG, "StartRecord listener")
+        viewPager.isUserInputEnabled = false
+
+        mediaRecorderManager.startRecording()
+        timerManager.start(binding.textTime)
+        button.setImageResource(R.drawable.ic_action_stop)
+
+        button.customSize = 65.toPx()
+
+        binding.deleteIcon.visibility = View.VISIBLE
+        binding.saveIcon.visibility = View.VISIBLE
+    }
+
+    private fun unlockHoldButton(button: MoveFloatingActionButton) {
+        Log.i(TAG, "UnlockHold listener")
+        stopButton(button)
+        setAlarmDialog.showSetAlertDialog()
+        holdButton = false
     }
 
     private fun setActionUpListener() {

@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.arkadii.glagoli.databinding.ActivityMainBinding
 
 
@@ -17,7 +18,6 @@ class MainActivity : AppCompatActivity(),  ActivityCompat.OnRequestPermissionsRe
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.i(TAG, "Start MainActivity")
-
         init()
         permissionHelper.checkPermission()
     }

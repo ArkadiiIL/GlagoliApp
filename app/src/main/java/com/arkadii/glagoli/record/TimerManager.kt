@@ -11,6 +11,7 @@ class TimerManager(private val appCompatActivity: AppCompatActivity) {
     private val timer = Timer()
     private var time = 0.0
     private var timerTask: TimerTask? = null
+    @Volatile
     private var isStarted = false
 
     fun start(timeText: TextView) {

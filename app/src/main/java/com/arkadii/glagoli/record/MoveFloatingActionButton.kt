@@ -56,16 +56,13 @@ class MoveFloatingActionButton: FloatingActionButton {
         super.setOnTouchListener(moveListener)
     }
 
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-        val uncheckedParent = parent
-        if(uncheckedParent is View) uncheckedParent.getLocationOnScreen(parentLocation)
-        else error("Parent is not View")
-
-    }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
+        Log.d(TAG, "onLayout")
+        val uncheckedParent = parent
+        if(uncheckedParent is View) uncheckedParent.getLocationOnScreen(parentLocation)
+        else error("Parent is not View")
         getLocationOnScreen(startLocation)
     }
 
@@ -140,6 +137,10 @@ class MoveFloatingActionButton: FloatingActionButton {
 
     fun returnToStartLocation() {
         Log.d(TAG, "Return to start location")
+        Log.d(TAG, "StartLocation x == ${startLocation[0].toFloat()} " +
+                "StartLocation y == ${startLocation[1].toFloat()}")
+        Log.d(TAG, "ParentLocation x == ${parentLocation[0]} " +
+                "ParentLocation y == ${parentLocation[1]}" )
         isButtonDown = false
         animate(computeX(startLocation[0].toFloat()), computeY(startLocation[1].toFloat()))
     }
