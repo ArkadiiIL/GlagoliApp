@@ -1,18 +1,13 @@
 package com.arkadii.glagoli.calendar
 
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
-import com.arkadii.glagoli.AlarmReceiver
 import com.arkadii.glagoli.R
 import com.arkadii.glagoli.data.Alarm
 import com.arkadii.glagoli.data.AlarmViewModel
 import com.arkadii.glagoli.record.SetAlarmDialog
-import com.arkadii.glagoli.util.getAlarmManager
 import com.arkadii.glagoli.util.getTimePicker
 import com.arkadii.glagoli.util.setAlarm
 import com.google.android.material.timepicker.MaterialTimePicker

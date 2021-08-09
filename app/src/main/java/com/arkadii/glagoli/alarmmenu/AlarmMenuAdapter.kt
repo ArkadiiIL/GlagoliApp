@@ -1,7 +1,10 @@
 package com.arkadii.glagoli.alarmmenu
 
+import android.app.AlarmManager
 import android.app.AlertDialog
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.media.AudioAttributes
 import android.text.format.DateFormat
 import android.util.Log
@@ -9,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
+import com.arkadii.glagoli.AlarmReceiver
 import com.arkadii.glagoli.R
 import com.arkadii.glagoli.calendar.EditCalendarDialog
 import com.arkadii.glagoli.data.Alarm
@@ -130,6 +134,7 @@ class AlarmMenuAdapter(private val context: Context,
 
     private fun editAlarm(alarm: Alarm) {
         val editCalendarDialog = EditCalendarDialog(context, fragmentManager, alarm, alarmViewModel)
+        Log.i(TAG, "Show edit dialog")
         editCalendarDialog.showCalendarDialog()
     }
 
@@ -137,16 +142,22 @@ class AlarmMenuAdapter(private val context: Context,
         holder.swEnable.setOnCheckedChangeListener { buttonView, isChecked ->
             if(isChecked) {
                 if(System.currentTimeMillis() < alarm.alarmTime) {
-                alarm.isEnabled = true
-                setAlarm(alarm, context)
-                alarmViewModel.updateAlarm(alarm) } else {
+                    if(alarm.pendingIntentId == 0) {
+                        Log.i(TAG, "Turn on $alarm")
+                        alarm.isEnabled = true
+                        Log.d(TAG, "Set $alarm")
+                        setAlarm(alarm, context)
+                        alarmViewModel.updateAlarm(alarm)
+                    }
+                } else {
                     buttonView.isChecked = false
                     editAlarm(alarm)
                 }
             } else {
                 alarm.isEnabled = false
-                alarm.pendingIntentId = 0
+                Log.d(TAG, "Cancel $alarm")
                 cancelAlarm(alarm, context)
+                alarm.pendingIntentId = 0
                 alarmViewModel.updateAlarm(alarm)
             }
         }
@@ -185,6 +196,7 @@ class AlarmMenuAdapter(private val context: Context,
         this.data = data
         notifyDataSetChanged()
     }
+
 
     companion object {
         const val TAG = "AlarmMenuAdapter"

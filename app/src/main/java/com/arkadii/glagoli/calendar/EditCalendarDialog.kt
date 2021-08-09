@@ -1,6 +1,7 @@
 package com.arkadii.glagoli.calendar
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import com.arkadii.glagoli.R
@@ -42,6 +43,7 @@ class EditCalendarDialog(private val context: Context,
                 calendar.set(Calendar.SECOND, 0)
                 if(currentTime <= calendar.timeInMillis) {
                     if(alarm.isEnabled) {
+                        Log.d(TAG, "Cancel $alarm")
                         cancelAlarm(alarm, context)
                         alarm.pendingIntentId = 0
                     }
@@ -52,8 +54,10 @@ class EditCalendarDialog(private val context: Context,
                         if(calendar.get(Calendar.DAY_OF_WEEK) == 1) 6
                         else calendar.get(Calendar.DAY_OF_WEEK) - 2
                     alarm.dayOfWeek = dayOfWeek
-                    alarmViewModel.updateAlarm(alarm)
+                    Log.d(TAG, "Set $alarm")
                     setAlarm(alarm, context)
+                    Log.d(TAG, "Update $alarm")
+                    alarmViewModel.updateAlarm(alarm)
                     cancelDialog()
                 } else {
                     val toastText = context.getText(R.string.wrong_time)
