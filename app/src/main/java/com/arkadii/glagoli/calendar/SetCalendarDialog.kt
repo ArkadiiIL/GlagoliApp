@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
+import androidx.viewpager2.widget.ViewPager2
 import com.arkadii.glagoli.R
 import com.arkadii.glagoli.data.Alarm
 import com.arkadii.glagoli.data.AlarmViewModel
@@ -15,7 +16,8 @@ import java.util.*
 
 class SetCalendarDialog(private val context: Context,
                         private val fragmentManager: FragmentManager,
-                        private val alarmViewModel: AlarmViewModel): CalendarDialog(context) {
+                        private val alarmViewModel: AlarmViewModel,
+                        private val viewPager: ViewPager2): CalendarDialog(context) {
     var setAlarmDialog: SetAlarmDialog? = null
     var currentRecordPath = ""
 
@@ -64,6 +66,7 @@ class SetCalendarDialog(private val context: Context,
 
                 saveAlarm(alarm)
                 cancelDialog()
+                viewPager.currentItem = 1
                 val alarmDialog = setAlarmDialog
                 if (alarmDialog != null) {
                     alarmDialog.closeDialog()

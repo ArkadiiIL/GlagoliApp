@@ -55,9 +55,11 @@ class RecordFragment(private val viewPager: ViewPager2) : Fragment() {
             mediaPlayerManager = MediaPlayerManager()
             Log.i(TAG, "Init CalendarDialog")
             val alarmViewModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
-            calendarDialog = SetCalendarDialog(requireContext(),
+            calendarDialog = SetCalendarDialog(
+                requireContext(),
                 childFragmentManager,
-                alarmViewModel)
+                alarmViewModel,
+                viewPager)
             Log.i(TAG, "Init SetDialog")
             setAlarmDialog = SetAlarmDialog(requireContext())
 

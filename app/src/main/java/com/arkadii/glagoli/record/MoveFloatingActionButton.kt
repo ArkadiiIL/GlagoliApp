@@ -1,6 +1,8 @@
 package com.arkadii.glagoli.record
 
 import android.content.Context
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
@@ -18,6 +20,7 @@ class MoveFloatingActionButton: FloatingActionButton {
     private val parentLocation: IntArray = IntArray(2)
     private val startLocation: IntArray = IntArray(2)
     private var move: ButtonMove = ButtonMove.DEFAULT
+    private val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     @Volatile
     private var isButtonDown = false
     var defaultBorder = 0.5
@@ -38,10 +41,12 @@ class MoveFloatingActionButton: FloatingActionButton {
         when(event.action) {
             MotionEvent.ACTION_DOWN -> {
                 Log.i(TAG, "Button ACTION_DOWN")
+                vibrate()
                 eventDown(event)
             }
             MotionEvent.ACTION_UP -> {
                 Log.i(TAG, "Button ACTION_UP")
+                vibrate()
                 if(isButtonDown) eventUp(event)
             }
             MotionEvent.ACTION_MOVE -> {
@@ -50,6 +55,13 @@ class MoveFloatingActionButton: FloatingActionButton {
             }
         }
         false
+    }
+
+    private fun vibrate() {
+        val vibrationEffect = VibrationEffect.createOneShot(
+            10, VibrationEffect.DEFAULT_AMPLITUDE)
+        vibrator.cancel()
+        vibrator.vibrate(vibrationEffect)
     }
 
     init {

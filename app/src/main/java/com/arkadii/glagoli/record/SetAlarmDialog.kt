@@ -174,12 +174,17 @@ class SetAlarmDialog(private val context: Context) {
         val text = setDialogBinding.editName.text.toString()
         return when {
             text == "" -> {
-                Log.i(RecordFragment.TAG, "Text for rename record is empty")
+                Log.i(TAG, "Text for rename record is empty")
                 setDialogBinding.editName.error = context.getString(R.string.cannot_be_empty)
                 false
             }
+            !text.matches(Regex("^[^*&%\\s]+\$")) -> {
+                Log.i(TAG, "Text not matching")
+                setDialogBinding.editName.error = context.getString(R.string.incorrect_filename)
+                false
+            }
             text.length > 50 -> {
-                Log.i(RecordFragment.TAG, "Text for rename is greater than 50 symbols")
+                Log.i(TAG, "Text for rename is greater than 50 symbols")
                 setDialogBinding.editName.error = context.getString(R.string.length_is_greater)
                 false
             }
@@ -187,8 +192,8 @@ class SetAlarmDialog(private val context: Context) {
                 val file = File(currentRecordPath)
                 val pathToRename = "${path}${text.setRecordFormat()}"
                 val fileToRename = File(pathToRename)
-                Log.d(RecordFragment.TAG, "File path = ${file.absolutePath}")
-                Log.d(RecordFragment.TAG, "RenameFile path = ${fileToRename.absolutePath}")
+                Log.d(TAG, "File path = ${file.absolutePath}")
+                Log.d(TAG, "RenameFile path = ${fileToRename.absolutePath}")
                 if(fileToRename.exists()) {
                     Log.i(RecordFragment.TAG, "File exists")
                     setDialogBinding.editName.error = context.getString(R.string.file_exist)

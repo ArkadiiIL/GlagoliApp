@@ -6,7 +6,7 @@ class AlarmRepository(private val alarmDAO: AlarmDAO) {
 
     fun getAllLiveData() = alarmDAO.getAllLiveData()
 
-    fun getAlarmByPath(path: String) = alarmDAO.getAlarmByPath(path)
+    suspend fun getAlarmByPath(path: String) = alarmDAO.getAlarmByPath(path)
 
     suspend fun addAlarms(alarms: Array<out Alarm>) = alarmDAO.insert(alarms)
 

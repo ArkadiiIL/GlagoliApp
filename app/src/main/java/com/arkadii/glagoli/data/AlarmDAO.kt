@@ -12,7 +12,7 @@ interface AlarmDAO {
     fun getAllAlarms(): List<Alarm>
 
     @Query("SELECT * FROM alarm_table WHERE recordPath == :path")
-    fun getAlarmByPath(path: String): LiveData<Alarm>
+    fun getAlarmByPath(path: String): Alarm
 
     @Insert
     fun insert(alarms: Array<out Alarm>)

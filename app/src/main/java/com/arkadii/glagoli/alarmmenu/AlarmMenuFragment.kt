@@ -46,7 +46,7 @@ class AlarmMenuFragment: Fragment() {
         addItemDecoration(DividerItemDecoration(requireContext(),DividerItemDecoration.VERTICAL))
 
         alarmViewModel.getAllAlarms.observe(requireActivity()) {
-            Log.d(TAG, "Set data in AlarmMenuAdapter")
+            Log.d(TAG, "Update data in AlarmMenuAdapter")
             alarmMenuAdapter.setData(it)
         }
 

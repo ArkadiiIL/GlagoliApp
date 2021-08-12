@@ -7,6 +7,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.arkadii.glagoli.databinding.ActivityMainBinding
+import android.content.Intent
+import android.net.Uri
+
+import android.os.Build
+import android.provider.Settings
 
 
 class MainActivity : AppCompatActivity(),  ActivityCompat.OnRequestPermissionsResultCallback {
@@ -20,6 +25,15 @@ class MainActivity : AppCompatActivity(),  ActivityCompat.OnRequestPermissionsRe
         Log.i(TAG, "Start MainActivity")
         init()
         permissionHelper.checkPermission()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!Settings.canDrawOverlays(this)) {
+                val intent = Intent(
+                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:$packageName")
+                )
+                startActivity(intent)
+            }
+        }
     }
 
     private fun init() {

@@ -23,7 +23,7 @@ class AlarmViewModel(application: Application): AndroidViewModel(application) {
         }
     }
 
-    fun getAlarmByPath(path: String): LiveData<Alarm> = repository.getAlarmByPath(path)
+    suspend fun getAlarmByPath(path: String): Alarm = repository.getAlarmByPath(path)
 
 
     fun updateAlarm(alarm: Alarm) {

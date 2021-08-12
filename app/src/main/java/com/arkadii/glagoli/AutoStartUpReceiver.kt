@@ -10,6 +10,7 @@ import android.util.Log
 import com.arkadii.glagoli.data.AlarmDatabase
 import com.arkadii.glagoli.data.AlarmRepository
 import com.arkadii.glagoli.util.getAlarmManager
+import com.arkadii.glagoli.util.setAlarm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -32,18 +33,7 @@ class AutoStartUpReceiver: BroadcastReceiver() {
         CoroutineScope(Dispatchers.IO).launch {
             alarmRepository.getAllAlarms().filter { alarm -> alarm.isEnabled }.forEach {
                 Log.i(TAG, "Set $it")
-                val intent = Intent(context, AlarmReceiver::class.java)
-                intent.putExtra("path", it.recordPath)
-                val pendingIntent =
-                    PendingIntent.getBroadcast(context,
-                        it.pendingIntentId,
-                        intent,
-                        PendingIntent.FLAG_ONE_SHOT)
-                alarmManager.setExact(
-                    AlarmManager.RTC_WAKEUP,
-                    it.alarmTime,
-                    pendingIntent
-                )
+                setAlarm(it, context)
             }
         }
     }

@@ -1,10 +1,7 @@
 package com.arkadii.glagoli.alarmmenu
 
-import android.app.AlarmManager
 import android.app.AlertDialog
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.media.AudioAttributes
 import android.text.format.DateFormat
 import android.util.Log
@@ -12,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
-import com.arkadii.glagoli.AlarmReceiver
 import com.arkadii.glagoli.R
 import com.arkadii.glagoli.calendar.EditCalendarDialog
 import com.arkadii.glagoli.data.Alarm
@@ -81,7 +77,7 @@ class AlarmMenuAdapter(private val context: Context,
 
     private fun getTime(calendar: Calendar): String {
         val format = if (DateFormat.is24HourFormat(context))
-            SimpleDateFormat("hh:mm", Locale.getDefault())
+            SimpleDateFormat("HH:mm", Locale.getDefault())
         else SimpleDateFormat("hh:mm a", Locale.getDefault())
         return format.format(calendar.time)
     }
